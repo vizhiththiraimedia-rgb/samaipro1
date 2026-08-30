@@ -1,11 +1,10 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 try:
-    try:
     import MetaTrader5 as mt5
 except ImportError:
     mt5 = None
-    
+
 # Mock constants if MT5 is not available (e.g. on Linux/Railway)
 class MockMT5:
     ORDER_TYPE_BUY = 0
