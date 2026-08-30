@@ -1,6 +1,40 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-import MetaTrader5 as mt5
+try:
+    try:
+    import MetaTrader5 as mt5
+except ImportError:
+    mt5 = None
+    
+# Mock constants if MT5 is not available (e.g. on Linux/Railway)
+class MockMT5:
+    ORDER_TYPE_BUY = 0
+    ORDER_TYPE_SELL = 1
+    TRADE_ACTION_DEAL = 1
+    ORDER_TIME_GTC = 0
+    ORDER_FILLING_IOC = 1
+    TRADE_RETCODE_DONE = 10009
+
+if mt5 is None:
+    mt5 = MockMT5()
+    def mock_initialize(): return False
+    def mock_account_info(): return None
+    def mock_symbol_select(*args): return False
+    def mock_symbol_info(*args): return None
+    def mock_symbol_info_tick(*args): return None
+    def mock_order_send(*args): return None
+    
+    mt5.initialize = mock_initialize
+    mt5.account_info = mock_account_info
+    mt5.symbol_select = mock_symbol_select
+    mt5.symbol_info = mock_symbol_info
+    mt5.symbol_info_tick = mock_symbol_info_tick
+    mt5.order_send = mock_order_send
+
+    MT5_AVAILABLE = True
+except ImportError:
+    mt5 = None
+    MT5_AVAILABLE = False
 import threading
 import time
 import random
@@ -63,12 +97,14 @@ def trade_worker():
 
 @router.get("/status")
 def get_status():
+    if not MT5_AVAILABLE: return {"connected": False, "error": "MT5 is only available when running locally on Windows."}
     if not mt5.initialize(): return {"connected": False, "error": "MT5 not running."}
     acc = mt5.account_info()
     return {"connected": True, "login": acc.login, "balance": acc.balance, "equity": acc.equity, "trading_state": trading_state} if acc else {"connected": False}
 
 @router.post("/start")
 def start_trading(config: AutoTradeConfig):
+    if not MT5_AVAILABLE: raise HTTPException(status_code=400, detail="MT5 is only available when running locally on Windows.")
     if trading_state["is_running"]: return {"status": "Already running"}
     if not mt5.initialize() or not mt5.symbol_select(config.symbol, True): 
         raise HTTPException(status_code=400, detail="MT5 error. Check if symbol exists.")
