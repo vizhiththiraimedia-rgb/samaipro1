@@ -1,9 +1,15 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
+import threading
+import time
+import random
+
 try:
     import MetaTrader5 as mt5
+    MT5_AVAILABLE = True
 except ImportError:
     mt5 = None
+    MT5_AVAILABLE = False
 
 # Mock constants if MT5 is not available (e.g. on Linux/Railway)
 class MockMT5:
@@ -14,7 +20,7 @@ class MockMT5:
     ORDER_FILLING_IOC = 1
     TRADE_RETCODE_DONE = 10009
 
-if mt5 is None:
+if not MT5_AVAILABLE:
     mt5 = MockMT5()
     def mock_initialize(): return False
     def mock_account_info(): return None
@@ -29,14 +35,6 @@ if mt5 is None:
     mt5.symbol_info = mock_symbol_info
     mt5.symbol_info_tick = mock_symbol_info_tick
     mt5.order_send = mock_order_send
-
-    MT5_AVAILABLE = True
-except ImportError:
-    mt5 = None
-    MT5_AVAILABLE = False
-import threading
-import time
-import random
 
 router = APIRouter(prefix="/mt5", tags=["mt5"])
 
