@@ -56,13 +56,31 @@ def execute_trade(symbol, lot_size, order_type, sl_points, tp_points):
     price = mt5.symbol_info_tick(symbol).ask if order_type == mt5.ORDER_TYPE_BUY else mt5.symbol_info_tick(symbol).bid
     sl = price - (sl_points * point) if order_type == mt5.ORDER_TYPE_BUY else price + (sl_points * point)
     tp = price + (tp_points * point) if order_type == mt5.ORDER_TYPE_BUY else price - (tp_points * point)
-    req = {
-        "action": mt5.TRADE_ACTION_DEAL, "symbol": symbol, "volume": lot_size, 
-        "type": order_type, "price": price, "sl": sl, "tp": tp, "deviation": 20, 
-        "magic": 234000, "comment": "SAM AI Auto", "type_time": mt5.ORDER_TIME_GTC, 
-        "type_filling": mt5.ORDER_FILLING_IOC
-    }
-    return mt5.order_send(req)
+    
+    # Try different filling modes to support all brokers
+    fill_modes = [
+        getattr(mt5, "ORDER_FILLING_FOK", 0), 
+        getattr(mt5, "ORDER_FILLING_IOC", 1), 
+        getattr(mt5, "ORDER_FILLING_RETURN", 2)
+    ]
+    
+    last_res = None
+    for fill_mode in fill_modes:
+        req = {
+            "action": mt5.TRADE_ACTION_DEAL, "symbol": symbol, "volume": lot_size, 
+            "type": order_type, "price": price, "sl": sl, "tp": tp, "deviation": 20, 
+            "magic": 234000, "comment": "SAM AI Auto", "type_time": mt5.ORDER_TIME_GTC, 
+            "type_filling": fill_mode
+        }
+        res = mt5.order_send(req)
+        if res is None:
+            continue
+        last_res = res
+        # 10030 is TRADE_RETCODE_UNSUPPORTED_FILLING_MODE
+        if res.retcode != 10030:
+            break
+            
+    return last_res
 
 def trade_worker():
     while trading_state["is_running"]:
