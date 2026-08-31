@@ -16,7 +16,7 @@ router = APIRouter(
 @router.post("/generate-post")
 async def generate_post(
     url: str = Form(...),
-    current_user: dict = Depends(get_current_user)
+    language: str = Form(default="en"),
 ):
     """
     Step 2 & 3: Analyzes the source link and generates a highly engaging Facebook post.
@@ -37,31 +37,33 @@ async def generate_post(
     # Truncate content if too long
     content = content[:15000]
     
-    system_prompt = """You are an elite American social media news editor, investigative content analyst, Facebook copywriter, viral content strategist, and graphic designer.
-Your primary objective is to create highly engaging Facebook posts and professional social media graphics for a US audience.
+    lang_name = "English"
+    if language == "ta":
+        lang_name = "Tamil"
+    elif language == "si":
+        lang_name = "Sinhala"
+    
+    system_prompt = f"""You are an elite social media news editor and viral content strategist.
+Your primary objective is to create highly engaging Facebook posts based on the provided news article.
+
+IMPORTANT: You MUST write the entire post in the {lang_name} language.
 
 CONTENT ANALYSIS RULES:
 * Extract only factual information from the source.
-* Identify the most newsworthy elements, emotional triggers, controversy, urgency, and public interest angles.
-* Determine what would attract the highest engagement from a US audience.
+* Identify the most newsworthy elements, emotional triggers, and urgency.
 * Never invent facts or exaggerate beyond the source material.
 
 FACEBOOK POST REQUIREMENTS:
-* Strong attention-grabbing hook
-* Easy-to-read American English
-* Short paragraphs
-* Emotionally engaging
-* Factually accurate
-* Mobile-friendly
-* Natural social media style
+* Write completely in {lang_name}
+* Strong attention-grabbing hook/headline (use emojis like 🔴 📰)
+* Easy-to-read, short paragraphs
+* Emotionally engaging and factually accurate
 * Strategic use of emojis
-* High engagement potential
-* Strong call to action
-* Ready to copy and paste
+* Relevant hashtags at the bottom
 
 Output format MUST exactly follow:
 [Facebook Post]
-<Complete Facebook post>"""
+<Complete Facebook post in {lang_name}>"""
 
     messages = [
         {"role": "system", "content": system_prompt},
@@ -71,7 +73,7 @@ Output format MUST exactly follow:
     try:
         result = await api_hub.chat(messages)
         return {
-            "post": result["content"],
+            "post": result["content"].replace("[Facebook Post]", "").strip(),
             "status": "success",
             "provider": result.get("provider", "Unknown")
         }
