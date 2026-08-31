@@ -21,6 +21,7 @@ export default function SocialNewsPage() {
   const [postTone, setPostTone] = useState("breaking");
   const [loading, setLoading] = useState(false);
   const [postResult, setPostResult] = useState("");
+  const [featureImage, setFeatureImage] = useState("");
   const [copied, setCopied] = useState(false);
 
   const handleGenerateNews = async (customUrl?: string) => {
@@ -29,6 +30,7 @@ export default function SocialNewsPage() {
 
     setLoading(true);
     setPostResult("");
+    setFeatureImage("");
 
     try {
       const formData = new FormData();
@@ -42,6 +44,7 @@ export default function SocialNewsPage() {
 
       if (data && data.post) {
         setPostResult(data.post);
+        setFeatureImage(data.image || "");
       }
     } catch {
       // High-quality local news synthesis fallback
@@ -193,14 +196,25 @@ export default function SocialNewsPage() {
               )}
             </div>
 
-            <div style={{ flex: 1, minHeight: "300px", background: "#05060a", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "12px", padding: "1.2rem", color: postResult ? "#e5e7eb" : "#4b5563", fontSize: "0.92rem", lineHeight: 1.7, whiteSpace: "pre-wrap", overflowY: "auto" }}>
+            <div style={{ flex: 1, minHeight: "300px", background: "#05060a", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "12px", overflow: "hidden", display: "flex", flexDirection: "column" }}>
               {loading ? (
-                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100%", gap: "10px" }}>
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100%", padding: "3rem", gap: "10px" }}>
                   <RefreshCw className="animate-spin" size={28} color="#ef4444" />
                   <span style={{ color: "#9ca3af", fontSize: "0.85rem" }}>Extracting source metadata and synthesizing post...</span>
                 </div>
+              ) : postResult ? (
+                <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
+                  {featureImage && (
+                    <div style={{ width: "100%", height: "200px", backgroundImage: `url(${featureImage})`, backgroundSize: "cover", backgroundPosition: "center", borderBottom: "1px solid rgba(255,255,255,0.05)" }}></div>
+                  )}
+                  <div style={{ padding: "1.5rem", color: "#e5e7eb", fontSize: "0.95rem", lineHeight: 1.7, whiteSpace: "pre-wrap", overflowY: "auto", flex: 1 }}>
+                    {postResult}
+                  </div>
+                </div>
               ) : (
-                postResult || "Enter a news URL and click 'Generate Social News Post' to produce multi-lingual broadcast copy..."
+                <div style={{ padding: "1.5rem", color: "#4b5563", fontSize: "0.92rem" }}>
+                  Enter a news URL and click 'Generate Social News Post' to produce multi-lingual broadcast copy...
+                </div>
               )}
             </div>
           </div>

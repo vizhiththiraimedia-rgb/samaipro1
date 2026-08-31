@@ -205,6 +205,12 @@ class WebScraperTool(Tool):
             with urllib.request.urlopen(req, timeout=10) as response:
                 html_code = response.read().decode("utf-8", errors="ignore")
                 
+            # Extract main image before stripping
+            image_match = re.search(r'<meta property="og:image" content="(.*?)"', html_code, re.IGNORECASE)
+            if not image_match:
+                image_match = re.search(r'<img[^>]+src=["\'](.*?)["\']', html_code, re.IGNORECASE)
+            image_url = image_match.group(1).strip() if image_match else ""
+                
             # Remove scripts, styles, metadata
             clean_text = re.sub(r'<(script|style|head|footer|nav)[^>]*>.*?</\1>', '', html_code, flags=re.DOTALL | re.IGNORECASE)
             # Remove HTML tags
@@ -220,6 +226,7 @@ class WebScraperTool(Tool):
                 "tool": self.name,
                 "url": url,
                 "title": title,
+                "image_url": image_url,
                 "content": text_content[:5000],  # Truncate for token efficiency
                 "char_length": len(text_content)
             }

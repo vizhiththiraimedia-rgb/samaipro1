@@ -74,6 +74,7 @@ Output format MUST exactly follow:
         result = await api_hub.chat(messages)
         return {
             "post": result["content"].replace("[Facebook Post]", "").strip(),
+            "image": scrape_res.get("image_url", ""),
             "status": "success",
             "provider": result.get("provider", "Unknown")
         }
