@@ -21,9 +21,9 @@ interface AccessKey {
 }
 
 const DEFAULT_KEYS: AccessKey[] = [
-  { id: "key-master-1", key_code: "SAM-MASTER-ADMIN-2026-KEY", status: "active", current_uses: 48, max_uses: 999999, created_at: "2026-08-28T00:00:00Z", expires_at: "2036-08-28T00:00:00Z", scope: "Full Master Access" },
-  { id: "key-ext-2", key_code: "SAM-API-2026-TRANSLATE-PRO", status: "active", current_uses: 12, max_uses: 10000, created_at: "2026-08-28T10:00:00Z", expires_at: "2027-08-28T00:00:00Z", scope: "Translation & Voice API" },
-  { id: "key-dev-3", key_code: "SAM-DEV-SANDBOX-ACCESS-KEY", status: "active", current_uses: 3, max_uses: 500, created_at: "2026-08-28T14:30:00Z", expires_at: "2026-12-31T00:00:00Z", scope: "Coder & Agentic Sandbox" }
+  { id: "key-ext-1", key_code: "sk-samai-••••••••••••••••", status: "active", current_uses: 48, max_uses: 999999, created_at: "2026-08-28T00:00:00Z", expires_at: "2036-08-28T00:00:00Z", scope: "Full Master Access" },
+  { id: "key-ext-2", key_code: "sk-samai-••••••••••••••••", status: "active", current_uses: 12, max_uses: 10000, created_at: "2026-08-28T10:00:00Z", expires_at: "2027-08-28T00:00:00Z", scope: "Translation & Voice API" },
+  { id: "key-dev-3", key_code: "sk-samai-••••••••••••••••", status: "active", current_uses: 3, max_uses: 500, created_at: "2026-08-28T14:30:00Z", expires_at: "2026-12-31T00:00:00Z", scope: "Coder & Agentic Sandbox" }
 ];
 
 export default function AdminKeysPage() {

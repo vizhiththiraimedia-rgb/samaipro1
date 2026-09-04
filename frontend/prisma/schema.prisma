@@ -1,0 +1,383 @@
+generator client {
+  provider = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-1.1.x", "debian-openssl-3.0.x", "rhel-openssl-3.0.x", "rhel-openssl-1.0.x"]
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id              String    @id @default(cuid())
+  email           String    @unique
+  name            String
+  password        String?
+  role            String    @default("USER")
+  isVerified      Boolean   @default(false)
+  isActive        Boolean   @default(true)
+  twoFactorEnabled Boolean  @default(false)
+  twoFactorSecret String?
+  language        String    @default("en")
+  theme           String    @default("SYSTEM")
+  emailVerifiedAt DateTime?
+  lastLoginAt     DateTime?
+  profilePhoto    String?
+  apiKey          String?   @unique
+
+  birthDetails    BirthDetails[]
+  reports         Report[]
+  subscriptions   Subscription[]
+  payments        Payment[]
+  refreshTokens   RefreshToken[]
+  notifications   Notification[]
+  favorites       Favorite[]
+  auditLogs       AuditLog[]
+  apiKeys         ApiKey[]
+
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@map("users")
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@map("refresh_tokens")
+}
+
+model PasswordReset {
+  id        String   @id @default(cuid())
+  email     String
+  token     String   @unique
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@map("password_resets")
+}
+
+model BirthDetails {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  fullName    String
+  gender      String    @default("MALE")
+  dateOfBirth DateTime
+  birthTime   String
+  birthPlace  String
+  latitude    Float
+  longitude   Float
+  timezone    String
+  country     String
+  elevation   Float     @default(0)
+  dst         Float     @default(0)
+  utcOffset   Float
+  ayanamsa    String    @default("LAHIRI")
+  chartSystem String    @default("SOUTH_INDIAN")
+  isPrimary   Boolean   @default(false)
+
+  charts      Chart[]
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([userId])
+  @@map("birth_details")
+}
+
+model Chart {
+  id                String    @id @default(cuid())
+  birthDetailsId    String
+  birthDetails      BirthDetails @relation(fields: [birthDetailsId], references: [id], onDelete: Cascade)
+  chartType         String
+  planetaryPositions String
+  houses            String
+  aspects           String
+  yogas             String
+  doshas            String
+  shadbala          String
+  ashtakavarga      String
+  vimshottariDasa   String
+  nakshatra         String
+  pada              Int
+  lagna             String
+  moonSign          String
+  sunSign           String
+  ascendant         String
+  metadata          String?
+
+  reports           Report[]
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([birthDetailsId])
+  @@map("charts")
+}
+
+model Report {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  chartId     String?
+  chart       Chart?   @relation(fields: [chartId], references: [id], onDelete: SetNull)
+  type        String   @default("PERSONALITY")
+  title       String
+  content     String   
+  language    String   @default("en")
+  mode        String   @default("SIMPLE")
+  isAIGenerated Boolean @default(false)
+  isPublic    Boolean  @default(false)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId])
+  @@index([chartId])
+  @@map("reports")
+}
+
+model Subscription {
+  id          String       @id @default(cuid())
+  userId      String
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan        String       @default("FREE")
+  status      String       @default("ACTIVE")
+  startDate   DateTime
+  endDate     DateTime
+  paymentId   String?
+  amount      Float
+  currency    String       @default("USD")
+  gateway     String       @default("STRIPE")
+  canceledAt  DateTime?
+  renewalAttempts Int       @default(0)
+
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@map("subscriptions")
+}
+
+model Payment {
+  id                String         @id @default(cuid())
+  userId            String
+  user              User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subscriptionId    String?
+  amount            Float
+  currency          String         @default("USD")
+  status            String         @default("PENDING")
+  gateway           String         @default("STRIPE")
+  gatewayPaymentId  String         @unique
+  metadata          String
+  createdAt         DateTime       @default(now())
+
+  @@map("payments")
+}
+
+model Notification {
+  id        String        @id @default(cuid())
+  userId    String
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      String        @default("SYSTEM")
+  title     String
+  message   String
+  data      String?
+  isRead    Boolean       @default(false)
+  readAt    DateTime?
+
+  createdAt DateTime      @default(now())
+
+  @@index([userId])
+  @@map("notifications")
+}
+
+model Favorite {
+  id            String    @id @default(cuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  itemType      String
+  itemId        String
+  metadata      String?
+
+  createdAt     DateTime  @default(now())
+
+  @@unique([userId, itemType, itemId])
+  @@map("favorites")
+}
+
+model Translation {
+  id          String   @id @default(cuid())
+  key         String
+  language    String
+  value       String   
+  namespace   String   @default("common")
+  context     String?
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([key, language, namespace])
+  @@map("translations")
+}
+
+model AuditLog {
+  id          String   @id @default(cuid())
+  userId      String?
+  user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  action      String
+  entityType  String
+  entityId    String
+  oldValues   String?
+  newValues   String?
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime @default(now())
+
+  @@map("audit_logs")
+}
+
+model ApiKey {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name        String
+  key         String   @unique
+  lastUsedAt  DateTime?
+  expiresAt   DateTime?
+  isActive    Boolean  @default(true)
+
+  createdAt   DateTime @default(now())
+
+  @@map("api_keys")
+}
+
+model BlogPost {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  content     String   
+  excerpt     String?
+  featuredImage String?
+  authorId    String
+  status      String   @default("DRAFT")
+  publishedAt DateTime?
+  metaTitle   String?
+  metaDescription String?
+  metaKeywords String?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("blog_posts")
+}
+
+model Coupon {
+  id          String   @id @default(cuid())
+  code        String   @unique
+  type        String   @default("PERCENTAGE")
+  value       Float
+  maxUses     Int?
+  usedCount   Int      @default(0)
+  minAmount   Float?
+  maxDiscount Float?
+  validFrom   DateTime
+  validUntil  DateTime
+  isActive    Boolean  @default(true)
+  applicablePlans String?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("coupons")
+}
+
+model Astrologer {
+  id            String   @id @default(cuid())
+  name          String
+  slug          String   @unique
+  experience    String
+  photo         String?
+  category      String
+  languages     String
+  areas         String
+  isActive      Boolean  @default(true)
+  sortOrder     Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@map("astrologers")
+}
+
+model Remedy {
+  id            String   @id @default(cuid())
+  name          String
+  slug          String   @unique
+  category      String
+  subCategory   String?
+  price         Float?
+  currency      String   @default("INR")
+  description   String?
+  image         String?
+  isActive      Boolean  @default(true)
+  sortOrder     Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@map("remedies")
+}
+
+model Offer {
+  id            String   @id @default(cuid())
+  title         String
+  slug          String   @unique
+  subtitle      String?
+  originalPrice Float
+  discountedPrice Float
+  discount      String
+  pages         String?
+  languages     String?
+  delivery      String?
+  image         String?
+  href          String
+  isActive      Boolean  @default(true)
+  sortOrder     Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@map("offers")
+}
+
+model Celebrity {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  photo       String?
+  href        String
+  isActive    Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("celebrities")
+}
+
+model Testimonial {
+  id          String   @id @default(cuid())
+  name        String
+  text        String
+  photo       String?
+  isActive    Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("testimonials")
+}
+

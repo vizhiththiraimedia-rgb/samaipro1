@@ -6,6 +6,7 @@ import {
 } from 'lucide-react'
 import { PDFDocument, rgb } from 'pdf-lib'
 import dynamic from 'next/dynamic'
+import { getApiBaseUrl } from '../../../utils/api'
 const PdfViewer = dynamic(() => import('./components/PdfViewer'), { ssr: false })
 import './App.css'
 
@@ -34,7 +35,7 @@ function App() {
       formData.append('file', file);
       formData.append('prompt', chatInput);
       const API_URL = process.env.NEXT_PUBLIC_API_URL || '';
-      const res = await fetch(`${API_URL}/api/pdf-studio/chat`, {
+      const res = await fetch(`${getApiBaseUrl()}/pdf-studio/chat`, {
         method: 'POST',
         body: formData,
       });
@@ -55,7 +56,7 @@ function App() {
       const formData = new FormData();
       formData.append('file', file);
       const API_URL = process.env.NEXT_PUBLIC_API_URL || '';
-      const res = await fetch(`${API_URL}/api/pdf-studio/summary`, {
+      const res = await fetch(`${getApiBaseUrl()}/pdf-studio/summary`, {
         method: 'POST',
         body: formData,
       });
@@ -79,7 +80,7 @@ function App() {
       formData.append('file', file);
       const API_URL = process.env.NEXT_PUBLIC_API_URL || '';
       
-      const extractRes = await fetch(`${API_URL}/api/pdf-translate/extract-text`, {
+      const extractRes = await fetch(`${getApiBaseUrl()}/pdf-translate/extract-text`, {
         method: 'POST',
         body: formData,
       });
@@ -100,7 +101,7 @@ function App() {
       translateFormData.append('source_lang', 'auto');
       translateFormData.append('target_lang', langMap[translateLanguage] || 'ta');
 
-      const transRes = await fetch(`${API_URL}/api/pdf-translate/translate`, {
+      const transRes = await fetch(`${getApiBaseUrl()}/pdf-translate/translate`, {
         method: 'POST',
         body: translateFormData,
       });

@@ -1,6 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  serverExternalPackages: ['@node-jhora/core', '@node-jhora/prediction', '@node-jhora/analytics'],
+  output: 'standalone',
   images: {
     unoptimized: true,
   },

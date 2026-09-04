@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from database import get_db
 import models
 import schemas
-from security import get_current_user
+from security import get_current_user, require_api_credits
 from api_hub import api_hub
 import os
 import tempfile
@@ -116,9 +116,10 @@ async def transcribe_audio(
 async def text_to_speech(
     text: str = Form(...),
     voice_id: str = Form("21m00Tcm4TlvDq8ikWAM"),  # Default: Rachel (ElevenLabs)
+    language: str = Form("en"),
     project_id: Optional[str] = Form(None),
     db: Session = Depends(get_db),
-    current_user: dict = Depends(get_current_user)
+    current_user: dict = Depends(require_api_credits(cost=5))
 ):
     """Convert text to ultra-realistic human speech using ElevenLabs API"""
     import urllib.request
@@ -167,12 +168,40 @@ async def text_to_speech(
         except Exception as e:
             print(f"ElevenLabs TTS failed: {e}")
 
-    return {
-        "text": text,
-        "voice": voice_id,
-        "status": "ready",
-        "message": "Fallback: Browser Web Speech API active."
-    }
+    # Fallback to Google TTS (gTTS) to ensure real generated audio
+    from gtts import gTTS
+    import tempfile
+    
+    try:
+        
+        lang_code = "en"
+        if "ta" in language.lower() or "tamil" in language.lower(): lang_code = "ta"
+        elif "si" in language.lower() or "sinhala" in language.lower(): lang_code = "si"
+        elif "es" in language.lower(): lang_code = "es"
+        elif "fr" in language.lower(): lang_code = "fr"
+        tts = gTTS(text=text, lang=lang_code)
+        fd, path = tempfile.mkstemp(suffix=".mp3")
+        os.close(fd)
+        tts.save(path)
+        with open(path, "rb") as f:
+            audio_bytes = f.read()
+        os.remove(path)
+        audio_b64 = base64.b64encode(audio_bytes).decode("utf-8")
+        return {
+            "text": text,
+            "voice_id": voice_id,
+            "provider": "gTTS",
+            "audio_base64": audio_b64,
+            "audio_url": f"data:audio/mpeg;base64,{audio_b64}",
+            "status": "success"
+        }
+    except Exception as e:
+        return {
+            "text": text,
+            "voice": voice_id,
+            "status": "error",
+            "message": str(e)
+        }
 
 @router.post("/process-voice-command")
 async def process_voice_command(
@@ -213,3 +242,31 @@ Respond only with valid JSON, no other text."""
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Voice command processing failed: {str(e)}")
+from pydantic import BaseModel
+from fastapi.responses import FileResponse
+import tempfile
+import os
+
+class TTSRequest(BaseModel):
+    text: str
+    language: str = "en"
+
+@router.post("/tts")
+async def generate_tts(req: TTSRequest):
+    try:
+        from gtts import gTTS
+        lang_code = "en"
+        if req.language.lower() == "tamil": lang_code = "ta"
+        elif req.language.lower() == "sinhala": lang_code = "si"
+        elif req.language.lower() == "hindi": lang_code = "hi"
+        
+        tts = gTTS(text=req.text, lang=lang_code)
+        
+        # Save to a temporary file
+        fd, path = tempfile.mkstemp(suffix=".mp3")
+        os.close(fd)
+        tts.save(path)
+        
+        return FileResponse(path, media_type="audio/mpeg", filename="sam_ai_voice.mp3")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

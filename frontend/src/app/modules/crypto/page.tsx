@@ -1049,6 +1049,7 @@ export default function CryptoModulePage() {
                       <option value="ict">ICT 9:30 AM Breakout</option>
                       <option value="smc">SMC / Order Blocks</option>
                       <option value="scalping">Trend Scalping (EMA + RSI)</option>
+                      <option value="hft_pullback">EURUSD H1 Adaptive Pullback (HFT)</option>
                     </select>
                   </div>
                   

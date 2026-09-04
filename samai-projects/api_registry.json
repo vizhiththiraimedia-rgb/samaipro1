@@ -1,0 +1,1056 @@
+{
+  "registry_version": "1.0",
+  "api_base_url": "https://samai.com/api",
+  "generated_at": "2026-09-04",
+  "services": {
+    "newsflash_pro": {
+      "service_name": "NewsFlash Pro",
+      "service_slug": "newsflash-pro",
+      "description": "Generate AI social media posts from news URLs",
+      "module": "social_news",
+      "endpoint_prefix": "/social-news",
+      "theme_color": "#ef4444",
+      "cost_tier": "standard",
+      "endpoints": [
+        {
+          "name": "generate_post",
+          "method": "POST",
+          "path": "/social-news/generate-post",
+          "cost_credits": 2,
+          "description": "Generate social media post from news URL",
+          "params": { "url": "required", "language": "optional,default=en", "tone": "optional" }
+        },
+        {
+          "name": "schedule",
+          "method": "POST",
+          "path": "/social-news/schedule",
+          "cost_credits": 1,
+          "description": "Schedule a social media post"
+        },
+        {
+          "name": "trending",
+          "method": "GET",
+          "path": "/social-news/trending",
+          "cost_credits": 1,
+          "description": "Get trending news topics"
+        }
+      ]
+    },
+    "sam_coder": {
+      "service_name": "Sam Coder",
+      "service_slug": "sam-coder",
+      "description": "AI-powered code generation and review",
+      "module": "coding",
+      "endpoint_prefix": "/coding",
+      "theme_color": "#3b82f6",
+      "cost_tier": "premium",
+      "endpoints": [
+        {
+          "name": "generate",
+          "method": "POST",
+          "path": "/coding/generate",
+          "cost_credits": 5,
+          "description": "Generate code from description",
+          "params": { "prompt": "required", "language": "optional,default=python" }
+        },
+        {
+          "name": "review",
+          "method": "POST",
+          "path": "/coding/review",
+          "cost_credits": 3,
+          "description": "Review and suggest improvements to code"
+        },
+        {
+          "name": "fix",
+          "method": "POST",
+          "path": "/coding/fix",
+          "cost_credits": 4,
+          "description": "Fix bugs in provided code"
+        },
+        {
+          "name": "explain",
+          "method": "POST",
+          "path": "/coding/explain",
+          "cost_credits": 3,
+          "description": "Explain what a piece of code does"
+        }
+      ]
+    },
+    "sam_translate": {
+      "service_name": "Sam Translate",
+      "service_slug": "sam-translate",
+      "description": "Translate between Sinhala, Tamil, and English",
+      "module": "translate",
+      "endpoint_prefix": "/translate",
+      "theme_color": "#10b981",
+      "cost_tier": "standard",
+      "endpoints": [
+        {
+          "name": "text",
+          "method": "POST",
+          "path": "/translate/text",
+          "cost_credits": 1,
+          "description": "Translate text between languages",
+          "params": { "text": "required", "source_lang": "required", "target_lang": "required" }
+        },
+        {
+          "name": "document",
+          "method": "POST",
+          "path": "/translate/document",
+          "cost_credits": 3,
+          "description": "Translate uploaded document"
+        }
+      ]
+    },
+    "sam_image": {
+      "service_name": "Sam Image Studio",
+      "service_slug": "sam-image",
+      "description": "AI image generation and editing",
+      "module": "image",
+      "endpoint_prefix": "/image",
+      "theme_color": "#8b5cf6",
+      "cost_tier": "premium",
+      "endpoints": [
+        {
+          "name": "generate",
+          "method": "POST",
+          "path": "/image/generate",
+          "cost_credits": 5,
+          "description": "Generate image from text prompt",
+          "params": { "prompt": "required", "style": "optional", "size": "optional" }
+        },
+        {
+          "name": "analyze",
+          "method": "POST",
+          "path": "/image/analyze",
+          "cost_credits": 3,
+          "description": "Analyze and describe an image"
+        },
+        {
+          "name": "edit",
+          "method": "POST",
+          "path": "/image/edit",
+          "cost_credits": 4,
+          "description": "Edit an existing image"
+        }
+      ]
+    },
+    "sam_voice": {
+      "service_name": "Sam Audio Studio",
+      "service_slug": "sam-voice",
+      "description": "Text-to-speech and speech-to-text",
+      "module": "voice",
+      "endpoint_prefix": "/voice",
+      "theme_color": "#f59e0b",
+      "cost_tier": "premium",
+      "endpoints": [
+        {
+          "name": "tts",
+          "method": "POST",
+          "path": "/voice/tts",
+          "cost_credits": 2,
+          "description": "Convert text to speech audio",
+          "params": { "text": "required", "voice": "optional,default=en-US-Jenny" }
+        },
+        {
+          "name": "stt",
+          "method": "POST",
+          "path": "/voice/stt",
+          "cost_credits": 2,
+          "description": "Convert speech audio to text"
+        }
+      ]
+    },
+    "sam_video": {
+      "service_name": "Sam Video Studio",
+      "service_slug": "sam-video",
+      "description": "AI video generation and editing",
+      "module": "media_video",
+      "endpoint_prefix": "/media/video",
+      "theme_color": "#ec4899",
+      "cost_tier": "premium",
+      "endpoints": [
+        {
+          "name": "generate",
+          "method": "POST",
+          "path": "/media/video/generate",
+          "cost_credits": 10,
+          "description": "Generate video from text description"
+        },
+        {
+          "name": "edit",
+          "method": "POST",
+          "path": "/media/video/edit",
+          "cost_credits": 8,
+          "description": "Edit existing video"
+        },
+        {
+          "name": "analyze",
+          "method": "POST",
+          "path": "/media/video/analyze",
+          "cost_credits": 5,
+          "description": "Analyze video content"
+        }
+      ]
+    },
+    "sam_pdf": {
+      "service_name": "Sam PDF Studio",
+      "service_slug": "sam-pdf",
+      "description": "PDF processing, extraction, and editing",
+      "module": "pdf_studio",
+      "endpoint_prefix": "/pdf-studio",
+      "theme_color": "#dc2626",
+      "cost_tier": "standard",
+      "endpoints": [
+        {
+          "name": "extract",
+          "method": "POST",
+          "path": "/pdf-studio/extract",
+          "cost_credits": 2,
+          "description": "Extract text from PDF"
+        },
+        {
+          "name": "summarize",
+          "method": "POST",
+          "path": "/pdf-studio/summarize",
+          "cost_credits": 3,
+          "description": "Summarize PDF content"
+        },
+        {
+          "name": "translate",
+          "method": "POST",
+          "path": "/pdf-studio/translate",
+          "cost_credits": 4,
+          "description": "Translate PDF to another language"
+        },
+        {
+          "name": "edit",
+          "method": "POST",
+          "path": "/pdf-studio/edit",
+          "cost_credits": 3,
+          "description": "Edit text in a PDF"
+        }
+      ]
+    },
+    "sam_crypto": {
+      "service_name": "Sam Crypto Pro",
+      "service_slug": "sam-crypto",
+      "description": "Cryptocurrency market analysis and trading signals",
+      "module": "crypto",
+      "endpoint_prefix": "/crypto",
+      "theme_color": "#14b8a8",
+      "cost_tier": "standard",
+      "endpoints": [
+        {
+          "name": "market",
+          "method": "GET",
+          "path": "/crypto/market",
+          "cost_credits": 1,
+          "description": "Get live crypto market data"
+        },
+        {
+          "name": "news",
+          "method": "GET",
+          "path": "/crypto/news",
+          "cost_credits": 1,
+          "description": "Get crypto news"
+        },
+        {
+          "name": "analyze",
+          "method": "POST",
+          "path": "/crypto/analyze",
+          "cost_credits": 3,
+          "description": "Analyze a specific coin"
+        }
+      ]
+    },
+    "astro_studio": {
+      "service_name": "AstroSage Studio",
+      "service_slug": "astro-studio",
+      "description": "Vedic astrology charts and predictions",
+      "module": "astrology",
+      "endpoint_prefix": "/astrology",
+      "theme_color": "#7c3aed",
+      "cost_tier": "standard",
+      "endpoints": [
+        {
+          "name": "birth_chart",
+          "method": "POST",
+          "path": "/astrology/birth-chart",
+          "cost_credits": 3,
+          "description": "Generate birth chart (kundali)"
+        },
+        {
+          "name": "daily_horoscope",
+          "method": "POST",
+          "path": "/astrology/horoscope",
+          "cost_credits": 1,
+          "description": "Get daily horoscope"
+        },
+        {
+          "name": "dasha",
+          "method": "POST",
+          "path": "/astrology/dasha",
+          "cost_credits": 2,
+          "description": "Calculate Vimshottari dasha periods"
+        }
+      ]
+    },
+    "sam_lead": {
+      "service_name": "Sam LeadGen",
+      "service_slug": "sam-lead",
+      "description": "AI-powered lead generation and outreach",
+      "module": "lead_gen",
+      "endpoint_prefix": "/leads",
+      "theme_color": "#059669",
+      "cost_tier": "premium",
+      "endpoints": [
+        {
+          "name": "find",
+          "method": "POST",
+          "path": "/leads/find",
+          "cost_credits": 5,
+          "description": "Find leads for a business niche"
+        },
+        {
+          "name": "scrape",
+          "method": "POST",
+          "path": "/leads/scrape",
+          "cost_credits": 3,
+          "description": "Extract contacts from a website"
+        }
+      ]
+    },
+    "sam_learn": {
+      "service_name": "Sam Learn & Cues",
+      "service_slug": "sam-learn",
+      "description": "Personalized learning and tutoring",
+      "module": "learning",
+      "endpoint_prefix": "/learning",
+      "theme_color": "#2563eb",
+      "cost_tier": "standard",
+      "endpoints": [
+        {
+          "name": "explain",
+          "method": "POST",
+          "path": "/learning/explain",
+          "cost_credits": 2,
+          "description": "Explain a concept in simple terms"
+        },
+        {
+          "name": "quiz",
+          "method": "POST",
+          "path": "/learning/quiz",
+          "cost_credits": 1,
+          "description": "Generate a quiz on any topic"
+        },
+        {
+          "name": "tutor",
+          "method": "POST",
+          "path": "/learning/tutor",
+          "cost_credits": 3,
+          "description": "Interactive tutoring session"
+        }
+      ]
+    },
+    "sam_pro": {
+      "service_name": "Sam Pro",
+      "service_slug": "sam-pro",
+      "description": "Business intelligence and financial analysis",
+      "module": "business",
+      "endpoint_prefix": "/business",
+      "theme_color": "#7c2d12",
+      "cost_tier": "premium",
+      "endpoints": [
+        {
+          "name": "market_analysis",
+          "method": "POST",
+          "path": "/business/market-analysis",
+          "cost_credits": 8,
+          "description": "Analyze a market or industry"
+        },
+        {
+          "name": "finance_plan",
+          "method": "POST",
+          "path": "/business/finance-plan",
+          "cost_credits": 6,
+          "description": "Create a financial plan"
+        },
+        {
+          "name": "report",
+          "method": "POST",
+          "path": "/business/report",
+          "cost_credits": 5,
+          "description": "Generate a business report"
+        }
+      ]
+    },
+    "sam_seo": {
+      "service_name": "Sam SEO Pro",
+      "service_slug": "sam-seo",
+      "description": "SEO optimization and keyword research",
+      "module": "seo",
+      "endpoint_prefix": "/seo",
+      "theme_color": "#16a34a",
+      "cost_tier": "premium",
+      "endpoints": [
+        {
+          "name": "analyze",
+          "method": "POST",
+          "path": "/seo/analyze",
+          "cost_credits": 3,
+          "description": "Analyze SEO for a URL"
+        },
+        {
+          "name": "keywords",
+          "method": "POST",
+          "path": "/seo/keywords",
+          "cost_credits": 2,
+          "description": "Generate keyword ideas"
+        },
+        {
+          "name": "content",
+          "method": "POST",
+          "path": "/seo/content",
+          "cost_credits": 2,
+          "description": "Optimize content for SEO"
+        }
+      ]
+    },
+    "sam_flutter": {
+      "service_name": "Sam Flutter Builder",
+      "service_slug": "sam-flutter",
+      "description": "Generate Flutter widgets and mobile UI",
+      "module": "flutter_build",
+      "endpoint_prefix": "/flutter",
+      "theme_color": "#0284c7",
+      "cost_tier": "premium",
+      "endpoints": [
+        {
+          "name": "generate",
+          "method": "POST",
+          "path": "/flutter/generate",
+          "cost_credits": 5,
+          "description": "Generate Flutter widget code"
+        },
+        {
+          "name": "refactor",
+          "method": "POST",
+          "path": "/flutter/refactor",
+          "cost_credits": 4,
+          "description": "Refactor existing Flutter code"
+        }
+      ]
+    },
+    "sam_bot": {
+      "service_name": "Sam Bot (Telegram)",
+      "service_slug": "sam-bot",
+      "description": "Telegram bot for AI commands",
+      "module": "telegram_bot",
+      "endpoint_prefix": "/telegram",
+      "theme_color": "#0088cc",
+      "cost_tier": "standard",
+      "endpoints": [
+        {
+          "name": "webhook",
+          "method": "POST",
+          "path": "/telegram/webhook",
+          "cost_credits": 0,
+          "description": "Telegram bot webhook receiver"
+        },
+        {
+          "name": "send_message",
+          "method": "POST",
+          "path": "/telegram/send",
+          "cost_credits": 1,
+          "description": "Send message via Telegram bot"
+        }
+      ]
+    },
+    "sam_edit": {
+      "service_name": "Sam Editor Studio",
+      "service_slug": "sam-edit",
+      "description": "Rich media content editing and generation",
+      "module": "media",
+      "endpoint_prefix": "/media",
+      "theme_color": "#be123c",
+      "cost_tier": "standard",
+      "endpoints": [
+        {
+          "name": "caption",
+          "method": "POST",
+          "path": "/media/caption",
+          "cost_credits": 1,
+          "description": "Generate social media caption"
+        },
+        {
+          "name": "resize",
+          "method": "POST",
+          "path": "/media/resize",
+          "cost_credits": 1,
+          "description": "Resize image to social formats"
+        }
+      ]
+    },
+    "sam_media": {
+      "service_name": "Sam Media Studio",
+      "service_slug": "sam-media",
+      "description": "All-in-one media content creation",
+      "module": "media_content",
+      "endpoint_prefix": "/media",
+      "theme_color": "#7e22ce",
+      "cost_tier": "premium",
+      "endpoints": [
+        {
+          "name": "template",
+          "method": "POST",
+          "path": "/media/template",
+          "cost_credits": 2,
+          "description": "Generate content template"
+        }
+      ]
+    },
+    "buffer_sam": {
+      "service_name": "Buffer Sam",
+      "service_slug": "buffer-sam",
+      "description": "Social media scheduling buffer system",
+      "module": "social",
+      "endpoint_prefix": "/social",
+      "theme_color": "#1f2937",
+      "cost_tier": "standard",
+      "endpoints": [
+        {
+          "name": "queue",
+          "method": "POST",
+          "path": "/social/queue",
+          "cost_credits": 1,
+          "description": "Add post to social queue"
+        },
+        {
+          "name": "schedule",
+          "method": "POST",
+          "path": "/social/schedule",
+          "cost_credits": 2,
+          "description": "Schedule social media post"
+        }
+      ]
+    },
+    "excel_sam": {
+      "service_name": "Excel Sam",
+      "service_slug": "excel-sam",
+      "description": "AI-powered spreadsheet analysis and generation",
+      "module": "analytics",
+      "endpoint_prefix": "/analytics",
+      "theme_color": "#16a34a",
+      "cost_tier": "standard",
+      "endpoints": [
+        {
+          "name": "analyze",
+          "method": "POST",
+          "path": "/analytics/analyze",
+          "cost_credits": 3,
+          "description": "Analyze uploaded spreadsheet data"
+        },
+        {
+          "name": "generate",
+          "method": "POST",
+          "path": "/analytics/generate",
+          "cost_credits": 2,
+          "description": "Generate spreadsheet from description"
+        }
+      ]
+    },
+    "img_sam": {
+      "service_name": "IMG Sam",
+      "service_slug": "img-sam",
+      "description": "Quick image generation tool",
+      "module": "image",
+      "endpoint_prefix": "/image",
+      "theme_color": "#8b5cf6",
+      "cost_tier": "premium",
+      "endpoints": [
+        {
+          "name": "quick",
+          "method": "POST",
+          "path": "/image/quick",
+          "cost_credits": 5,
+          "description": "Quick image generation"
+        }
+      ]
+    },
+    "imgr_sam": {
+      "service_name": "IMGR Sam",
+      "service_slug": "imgr-sam",
+      "description": "AI image generation with advanced settings",
+      "module": "image",
+      "endpoint_prefix": "/image",
+      "theme_color": "#a855f7",
+      "cost_tier": "premium",
+      "endpoints": [
+        {
+          "name": "advanced",
+          "method": "POST",
+          "path": "/image/advanced",
+          "cost_credits": 8,
+          "description": "Advanced image generation with custom settings"
+        }
+      ]
+    },
+    "lagnova": {
+      "service_name": "Lagnova",
+      "service_slug": "lagnova",
+      "description": "Vedic astrology and prediction platform",
+      "module": "astrology",
+      "endpoint_prefix": "/astrology",
+      "theme_color": "#7c3aed",
+      "cost_tier": "premium",
+      "endpoints": [
+        {
+          "name": "full_chart",
+          "method": "POST",
+          "path": "/astrology/full-chart",
+          "cost_credits": 5,
+          "description": "Complete Vedic astrology analysis"
+        }
+      ]
+    },
+    "link_sam": {
+      "service_name": "Link Sam",
+      "service_slug": "link-sam",
+      "description": "Knowledge linking and document management",
+      "module": "knowledge",
+      "endpoint_prefix": "/knowledge",
+      "theme_color": "#047857",
+      "cost_tier": "standard",
+      "endpoints": [
+        {
+          "name": "search",
+          "method": "POST",
+          "path": "/knowledge/search",
+          "cost_credits": 1,
+          "description": "Search knowledge base"
+        },
+        {
+          "name": "add",
+          "method": "POST",
+          "path": "/knowledge/add",
+          "cost_credits": 1,
+          "description": "Add fact to knowledge base"
+        }
+      ]
+    },
+    "itex_sam": {
+      "service_name": "I-Tex",
+      "service_slug": "itex-sam",
+      "description": "Text extraction and document intelligence",
+      "module": "document",
+      "endpoint_prefix": "/document",
+      "theme_color": "#475569",
+      "cost_tier": "standard",
+      "endpoints": [
+        {
+          "name": "extract",
+          "method": "POST",
+          "path": "/document/extract",
+          "cost_credits": 2,
+          "description": "Extract text from documents"
+        }
+      ]
+    },
+    "mybot_sam": {
+      "service_name": "MyBot",
+      "service_slug": "mybot-sam",
+      "description": "Personal AI assistant bot",
+      "module": "chat",
+      "endpoint_prefix": "/chat",
+      "theme_color": "#0ea5e9",
+      "cost_tier": "standard",
+      "endpoints": [
+        {
+          "name": "chat",
+          "method": "POST",
+          "path": "/chat/completions",
+          "cost_credits": 1,
+          "description": "Chat with personal AI assistant"
+        }
+      ]
+    },
+    "orb_sam": {
+      "service_name": "ORB",
+      "service_slug": "orb-sam",
+      "description": "AI Council - multi-perspective analysis",
+      "module": "agents_council",
+      "endpoint_prefix": "/agents/council",
+      "theme_color": "#dc2626",
+      "cost_tier": "premium",
+      "endpoints": [
+        {
+          "name": "debate",
+          "method": "POST",
+          "path": "/agents/council/debate",
+          "cost_credits": 10,
+          "description": "Multi-agent debate on a topic"
+        }
+      ]
+    },
+    "paper_sam": {
+      "service_name": "Paper Sam",
+      "service_slug": "paper-sam",
+      "description": "AI research paper analysis and writing",
+      "module": "research",
+      "endpoint_prefix": "/research",
+      "theme_color": "#1e40af",
+      "cost_tier": "premium",
+      "endpoints": [
+        {
+          "name": "analyze",
+          "method": "POST",
+          "path": "/research/analyze",
+          "cost_credits": 5,
+          "description": "Analyze research paper"
+        },
+        {
+          "name": "write",
+          "method": "POST",
+          "path": "/research/write",
+          "cost_credits": 6,
+          "description": "Write research paper"
+        }
+      ]
+    },
+    "plan_sam": {
+      "service_name": "Plan Sam",
+      "service_slug": "plan-sam",
+      "description": "Task planning and project decomposition",
+      "module": "plan",
+      "endpoint_prefix": "/plan",
+      "theme_color": "#0f172a",
+      "cost_tier": "standard",
+      "endpoints": [
+        {
+          "name": "decompose",
+          "method": "POST",
+          "path": "/plan/decompose",
+          "cost_credits": 2,
+          "description": "Break down a task into steps"
+        },
+        {
+          "name": "timeline",
+          "method": "POST",
+          "path": "/plan/timeline",
+          "cost_credits": 2,
+          "description": "Create project timeline"
+        }
+      ]
+    },
+    "sam_audio": {
+      "service_name": "Sam Audio",
+      "service_slug": "sam-audio",
+      "description": "Audio processing and podcast generation",
+      "module": "voice",
+      "endpoint_prefix": "/voice",
+      "theme_color": "#cbd5e1",
+      "cost_tier": "standard",
+      "endpoints": [
+        {
+          "name": "podcast",
+          "method": "POST",
+          "path": "/voice/podcast",
+          "cost_credits": 4,
+          "description": "Generate podcast from text"
+        }
+      ]
+    },
+    "sam_vocal": {
+      "service_name": "Sam Vocal",
+      "service_slug": "sam-vocal",
+      "description": "Voice command and vocal AI interface",
+      "module": "voice_stt",
+      "endpoint_prefix": "/voice",
+      "theme_color": "#64748b",
+      "cost_tier": "standard",
+      "endpoints": [
+        {
+          "name": "transcribe",
+          "method": "POST",
+          "path": "/voice/transcribe",
+          "cost_credits": 2,
+          "description": "Transcribe audio to text"
+        }
+      ]
+    },
+    "sam_vs": {
+      "service_name": "Sam VS",
+      "service_slug": "sam-vs",
+      "description": "Output validation and quality assurance",
+      "module": "validation",
+      "endpoint_prefix": "/validation",
+      "theme_color": "#ef4444",
+      "cost_tier": "standard",
+      "endpoints": [
+        {
+          "name": "validate",
+          "method": "POST",
+          "path": "/validation/check",
+          "cost_credits": 1,
+          "description": "Validate AI output quality"
+        }
+      ]
+    },
+    "sam_tools": {
+      "service_name": "Sam Tools",
+      "service_slug": "samt-tools",
+      "description": "Utility tools and helper functions",
+      "module": "tools",
+      "endpoint_prefix": "/tools",
+      "theme_color": "#94a3b8",
+      "cost_tier": "free",
+      "endpoints": [
+        {
+          "name": "whois",
+          "method": "POST",
+          "path": "/tools/whois",
+          "cost_credits": 0,
+          "description": "Domain WHOIS lookup"
+        },
+        {
+          "name": "ping",
+          "method": "POST",
+          "path": "/tools/ping",
+          "cost_credits": 0,
+          "description": "Network ping check"
+        }
+      ]
+    },
+    "ts_tradebot": {
+      "service_name": "TS TradeBot",
+      "service_slug": "tradesam",
+      "description": "AI crypto trading bot and signals",
+      "module": "crypto_trading",
+      "endpoint_prefix": "/crypto",
+      "theme_color": "#10b981",
+      "cost_tier": "premium",
+      "endpoints": [
+        {
+          "name": "signal",
+          "method": "POST",
+          "path": "/crypto/signal",
+          "cost_credits": 5,
+          "description": "Get trading signals"
+        },
+        {
+          "name": "portfolio",
+          "method": "POST",
+          "path": "/crypto/portfolio",
+          "cost_credits": 3,
+          "description": "Analyze portfolio"
+        }
+      ]
+    },
+    "ts_chat": {
+      "service_name": "TS Chat",
+      "service_slug": "chatsam",
+      "description": "Team chat with AI assistance",
+      "module": "chat",
+      "endpoint_prefix": "/chat",
+      "theme_color": "#0ea5e9",
+      "cost_tier": "standard",
+      "endpoints": [
+        {
+          "name": "team_chat",
+          "method": "POST",
+          "path": "/chat/team",
+          "cost_credits": 1,
+          "description": "Team chat message"
+        }
+      ]
+    },
+    "ts_holdings": {
+      "service_name": "TS Holdings",
+      "service_slug": "holdingsam",
+      "description": "Corporate knowledge and holdings portal",
+      "module": "knowledge",
+      "endpoint_prefix": "/knowledge",
+      "theme_color": "#1e293b",
+      "cost_tier": "premium",
+      "endpoints": [
+        {
+          "name": "internal_search",
+          "method": "POST",
+          "path": "/knowledge/internal",
+          "cost_credits": 2,
+          "description": "Search internal knowledge base"
+        }
+      ]
+    },
+    "ts_cues": {
+      "service_name": "TS Cues",
+      "service_slug": "cues-sam",
+      "description": "AI-powered learning cues and reminders",
+      "module": "learning",
+      "endpoint_prefix": "/learning",
+      "theme_color": "#f59e0b",
+      "cost_tier": "standard",
+      "endpoints": [
+        {
+          "name": "generate_cues",
+          "method": "POST",
+          "path": "/learning/cues",
+          "cost_credits": 1,
+          "description": "Generate learning cues"
+        }
+      ]
+    },
+    "ts_video": {
+      "service_name": "TS Video",
+      "service_slug": "videosam",
+      "description": "AI video production and editing suite",
+      "module": "video",
+      "endpoint_prefix": "/media/video",
+      "theme_color": "#be123c",
+      "cost_tier": "premium",
+      "endpoints": [
+        {
+          "name": "produce",
+          "method": "POST",
+          "path": "/media/video/produce",
+          "cost_credits": 10,
+          "description": "Produce video content"
+        }
+      ]
+    },
+    "newsflash_30": {
+      "service_name": "30 News",
+      "service_slug": "30news",
+      "description": "News flash generation with 30-second format",
+      "module": "social_news",
+      "endpoint_prefix": "/social-news",
+      "theme_color": "#dc2626",
+      "cost_tier": "standard",
+      "endpoints": [
+        {
+          "name": "flash",
+          "method": "POST",
+          "path": "/social-news/flash",
+          "cost_credits": 2,
+          "description": "Generate 30-second news flash"
+        }
+      ]
+    },
+    "espn_3es": {
+      "service_name": "3ES (ESPN)",
+      "service_slug": "3es",
+      "description": "ESPN sports analytics and news",
+      "module": "crypto",
+      "endpoint_prefix": "/sports",
+      "theme_color": "#1e40af",
+      "cost_tier": "standard",
+      "endpoints": [
+        {
+          "name": "scores",
+          "method": "GET",
+          "path": "/sports/scores",
+          "cost_credits": 1,
+          "description": "Live sports scores"
+        },
+        {
+          "name": "analysis",
+          "method": "POST",
+          "path": "/sports/analysis",
+          "cost_credits": 3,
+          "description": "Sports analysis"
+        }
+      ]
+    },
+    "network_30": {
+      "service_name": "30 Network",
+      "service_slug": "30network",
+      "description": "Network monitoring and management",
+      "module": "tools",
+      "endpoint_prefix": "/tools",
+      "theme_color": "#0f172a",
+      "cost_tier": "standard",
+      "endpoints": [
+        {
+          "name": "monitor",
+          "method": "POST",
+          "path": "/tools/monitor",
+          "cost_credits": 1,
+          "description": "Monitor network endpoint"
+        }
+      ]
+    },
+    "app_30": {
+      "service_name": "30 App",
+      "service_slug": "30app",
+      "description": "General 30-series application platform",
+      "module": "chat",
+      "endpoint_prefix": "/app",
+      "theme_color": "#374151",
+      "cost_tier": "free",
+      "endpoints": [
+        {
+          "name": "run",
+          "method": "POST",
+          "path": "/app/run",
+          "cost_credits": 0,
+          "description": "Run app command"
+        }
+      ]
+    },
+    "ar_sri_lanka": {
+      "service_name": "18AR Sri Lanka",
+      "service_slug": "18ar-lk",
+      "description": "18th Amendment research - Sri Lanka",
+      "module": "research",
+      "endpoint_prefix": "/research",
+      "theme_color": "#059669",
+      "cost_tier": "standard",
+      "endpoints": [
+        {
+          "name": "research_ar",
+          "method": "POST",
+          "path": "/research/ar18",
+          "cost_credits": 3,
+          "description": "Research 18th Amendment details"
+        }
+      ]
+    },
+    "boatyt": {
+      "service_name": "BoatYT",
+      "service_slug": "boatyt",
+      "description": "YouTube boat content automation",
+      "module": "media_video",
+      "endpoint_prefix": "/media/video",
+      "theme_color": "#0ea5e9",
+      "cost_tier": "premium",
+      "endpoints": [
+        {
+          "name": "generate_yt",
+          "method": "POST",
+          "path": "/media/video/youtube",
+          "cost_credits": 8,
+          "description": "Generate YouTube boat video"
+        }
+      ]
+    },
+    "dashboard_default": {
+      "service_name": "Sam Dashboard",
+      "service_slug": "dashboard",
+      "description": "Central Sam AI dashboard",
+      "module": "chat",
+      "endpoint_prefix": "/chat",
+      "theme_color": "#1e40af",
+      "cost_tier": "free",
+      "endpoints": [
+        {
+          "name": "dashboard",
+          "method": "GET",
+          "path": "/dashboard",
+          "cost_credits": 0,
+          "description": "Get dashboard overview"
+        }
+      ]
+    }
+  }
+}

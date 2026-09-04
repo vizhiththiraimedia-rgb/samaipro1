@@ -1,0 +1,386 @@
+"use client";
+
+import React from "react";
+import { cn } from "@/lib/utils";
+import { useLanguage } from "@/components/providers/language-provider";
+
+const ZODIAC_SIGNS = [
+  "Mesha", "Vrishabha", "Mithuna", "Karka",
+  "Simha", "Kanya", "Tula", "Vrischika",
+  "Dhanu", "Makara", "Kumbha", "Meena"
+];
+
+const SIGN_NUMBERS: Record<string, number> = {
+  "Mesha": 1, "Vrishabha": 2, "Mithuna": 3, "Karka": 4,
+  "Simha": 5, "Kanya": 6, "Tula": 7, "Vrischika": 8,
+  "Dhanu": 9, "Makara": 10, "Kumbha": 11, "Meena": 12
+};
+
+const PLANET_COLORS: Record<string, string> = {
+  "Sun": "#ea580c",
+  "Moon": "#2563eb",
+  "Mars": "#dc2626",
+  "Mercury": "#16a34a",
+  "Jupiter": "#d97706",
+  "Venus": "#db2777",
+  "Saturn": "#4f46e5",
+  "Rahu": "#7c3aed",
+  "Ketu": "#0891b2",
+  "Ascendant": "#0f172a",
+  "Lagna": "#0f172a",
+  "Asc": "#0f172a"
+};
+
+export function ChartRenderer({ planets, style = "south", className, onPlanetClick }: { planets: any[], style?: "north" | "south" | "east" | "kendare", className?: string, onPlanetClick?: (planet: any) => void }) {
+  const { language } = useLanguage();
+  
+  const getPlanetsInSign = (signName: string) => planets.filter(p => p.sign === signName);
+  
+  const lagnaPlanet = planets.find(p => p.name === "Ascendant" || p.name === "Asc" || p.name === "Lagna");
+  const lagnaSignName = lagnaPlanet?.sign || "Mesha";
+  const lagnaIndex = ZODIAC_SIGNS.indexOf(lagnaSignName);
+
+  const getPlanetAbbreviation = (name: string): string => {
+    if (language === "si") {
+      if (name.includes("Sun")) return "ර";
+      if (name.includes("Moon")) return "ච";
+      if (name.includes("Mars")) return "කු";
+      if (name.includes("Mercury")) return "බු";
+      if (name.includes("Jupiter")) return "ගු";
+      if (name.includes("Venus")) return "සි";
+      if (name.includes("Saturn")) return "ශ";
+      if (name.includes("Rahu")) return "රා";
+      if (name.includes("Ketu")) return "කේ";
+      return "ල";
+    } else if (language === "ta") {
+      if (name.includes("Sun")) return "சூ";
+      if (name.includes("Moon")) return "சந்";
+      if (name.includes("Mars")) return "செ";
+      if (name.includes("Mercury")) return "பு";
+      if (name.includes("Jupiter")) return "வி";
+      if (name.includes("Venus")) return "வெ";
+      if (name.includes("Saturn")) return "ச";
+      if (name.includes("Rahu")) return "ராகு";
+      if (name.includes("Ketu")) return "கேது";
+      return "ல";
+    } else {
+      if (name.includes("Sun")) return "Su";
+      if (name.includes("Moon")) return "Mo";
+      if (name.includes("Mars")) return "Ma";
+      if (name.includes("Mercury")) return "Me";
+      if (name.includes("Jupiter")) return "Ju";
+      if (name.includes("Venus")) return "Ve";
+      if (name.includes("Saturn")) return "Sa";
+      if (name.includes("Rahu")) return "Ra";
+      if (name.includes("Ketu")) return "Ke";
+      return "Asc";
+    }
+  };
+
+  // Traditional Sri Lankan Kendare (Diamond Layout in 3x3 CSS grid)
+  if (style === "kendare") {
+    const getPlanetsInHouse = (houseNum: number) => {
+      const signIdx = (lagnaIndex + (houseNum - 1)) % 12;
+      const signName = ZODIAC_SIGNS[signIdx];
+      return getPlanetsInSign(signName);
+    };
+
+    const getRasiNumForHouse = (houseNum: number): number => {
+      return ((lagnaIndex + (houseNum - 1)) % 12) + 1;
+    };
+
+    const renderHousePlanets = (houseNum: number) => {
+      const ps = getPlanetsInHouse(houseNum);
+      return (
+        <div className="flex flex-wrap gap-1 items-center justify-center mt-1">
+          {ps.map((p, idx) => {
+            const color = PLANET_COLORS[p.name] || "#475569";
+            const isLagna = p.name === "Ascendant" || p.name === "Asc" || p.name === "Lagna";
+            return (
+              <span 
+                key={idx} 
+                onClick={(e) => { e.stopPropagation(); if (onPlanetClick) onPlanetClick(p); }}
+                className={cn("text-xs font-black cursor-pointer hover:scale-125 transition-transform drop-shadow-sm", isLagna ? "bg-slate-200 px-1 py-[1px] rounded text-slate-900 border border-slate-400" : "")}
+                style={{ color: isLagna ? undefined : color }}
+              >
+                {getPlanetAbbreviation(p.name)}
+              </span>
+            );
+          })}
+        </div>
+      );
+    };
+
+    return (
+      <div className={cn("w-full aspect-square max-w-[500px] bg-[#ffffff] border-2 border-slate-400 rounded-sm relative overflow-hidden font-body shadow-md select-none", className)}>
+        {/* SVG Diagonal Lines Layer */}
+        <svg className="absolute inset-0 w-full h-full pointer-events-none z-10">
+          <line x1="0%" y1="0%" x2="33.33%" y2="33.33%" stroke="#cbd5e1" strokeWidth="1.5" />
+          <line x1="100%" y1="0%" x2="66.66%" y2="33.33%" stroke="#cbd5e1" strokeWidth="1.5" />
+          <line x1="0%" y1="100%" x2="33.33%" y2="66.66%" stroke="#cbd5e1" strokeWidth="1.5" />
+          <line x1="100%" y1="100%" x2="66.66%" y2="66.66%" stroke="#cbd5e1" strokeWidth="1.5" />
+          
+          <line x1="33.33%" y1="0%" x2="33.33%" y2="100%" stroke="#cbd5e1" strokeWidth="1.5" />
+          <line x1="66.66%" y1="0%" x2="66.66%" y2="100%" stroke="#cbd5e1" strokeWidth="1.5" />
+          <line x1="0%" y1="33.33%" x2="100%" y2="33.33%" stroke="#cbd5e1" strokeWidth="1.5" />
+          <line x1="0%" y1="66.66%" x2="100%" y2="66.66%" stroke="#cbd5e1" strokeWidth="1.5" />
+        </svg>
+
+        <div className="absolute inset-0 grid grid-cols-3 grid-rows-3 text-slate-800">
+          {/* Row 1, Cell 1: House 2 and 3 */}
+          <div className="relative p-2 overflow-hidden border border-slate-200">
+            {/* House 2 (Top-Right) */}
+            <div className="absolute top-1 right-2 flex flex-col items-center">
+              <span className="text-[10px] text-slate-400 font-bold bg-white px-1 rounded-full border border-slate-100">{getRasiNumForHouse(2)}</span>
+              {renderHousePlanets(2)}
+            </div>
+            {/* House 3 (Bottom-Left) */}
+            <div className="absolute bottom-1 left-2 flex flex-col items-center">
+              <span className="text-[10px] text-slate-400 font-bold bg-white px-1 rounded-full border border-slate-100">{getRasiNumForHouse(3)}</span>
+              {renderHousePlanets(3)}
+            </div>
+          </div>
+
+          {/* Row 1, Cell 2: House 1 (Lagna) */}
+          <div className="relative p-2 flex flex-col items-center justify-center border border-slate-200">
+            <span className="absolute top-1 text-[10px] text-slate-500 font-bold bg-slate-100 px-1.5 py-0.5 rounded-full border border-slate-200">{getRasiNumForHouse(1)}</span>
+            <div className="mt-4 flex flex-col items-center">
+              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Lagna</span>
+              {renderHousePlanets(1)}
+            </div>
+          </div>
+
+          {/* Row 1, Cell 3: House 12 and 11 */}
+          <div className="relative p-2 overflow-hidden border border-slate-200">
+            {/* House 12 (Top-Left) */}
+            <div className="absolute top-1 left-2 flex flex-col items-center">
+              <span className="text-[10px] text-slate-400 font-bold bg-white px-1 rounded-full border border-slate-100">{getRasiNumForHouse(12)}</span>
+              {renderHousePlanets(12)}
+            </div>
+            {/* House 11 (Bottom-Right) */}
+            <div className="absolute bottom-1 right-2 flex flex-col items-center">
+              <span className="text-[10px] text-slate-400 font-bold bg-white px-1 rounded-full border border-slate-100">{getRasiNumForHouse(11)}</span>
+              {renderHousePlanets(11)}
+            </div>
+          </div>
+
+          {/* Row 2, Cell 1: House 4 */}
+          <div className="relative p-2 flex flex-col items-center justify-center border border-slate-200">
+            <span className="absolute left-2 top-2 text-[10px] text-slate-400 font-bold bg-white px-1.5 rounded-full border border-slate-100">{getRasiNumForHouse(4)}</span>
+            {renderHousePlanets(4)}
+          </div>
+
+          {/* Row 2, Cell 2: Center (Moon Sign & Lagna Display) */}
+          <div className="bg-slate-50 relative p-2 flex flex-col items-center justify-center border border-slate-200 text-center z-20">
+            <span className="text-xs font-black text-slate-700 font-mono tracking-widest uppercase">RASI</span>
+            {lagnaPlanet && (
+              <span className="text-[10px] font-bold text-slate-400 mt-1">
+                Lagna: {lagnaPlanet.sign}
+              </span>
+            )}
+          </div>
+
+          {/* Row 2, Cell 3: House 10 */}
+          <div className="relative p-2 flex flex-col items-center justify-center border border-slate-200">
+            <span className="absolute right-2 top-2 text-[10px] text-slate-400 font-bold bg-white px-1.5 rounded-full border border-slate-100">{getRasiNumForHouse(10)}</span>
+            {renderHousePlanets(10)}
+          </div>
+
+          {/* Row 3, Cell 1: House 5 and 6 */}
+          <div className="relative p-2 overflow-hidden border border-slate-200">
+            {/* House 5 (Top-Left) */}
+            <div className="absolute top-1 left-2 flex flex-col items-center">
+              <span className="text-[10px] text-slate-400 font-bold bg-white px-1 rounded-full border border-slate-100">{getRasiNumForHouse(5)}</span>
+              {renderHousePlanets(5)}
+            </div>
+            {/* House 6 (Bottom-Right) */}
+            <div className="absolute bottom-1 right-2 flex flex-col items-center">
+              <span className="text-[10px] text-slate-400 font-bold bg-white px-1 rounded-full border border-slate-100">{getRasiNumForHouse(6)}</span>
+              {renderHousePlanets(6)}
+            </div>
+          </div>
+
+          {/* Row 3, Cell 2: House 7 */}
+          <div className="relative p-2 flex flex-col items-center justify-center border border-slate-200">
+            <span className="absolute bottom-1 text-[10px] text-slate-400 font-bold bg-white px-1.5 rounded-full border border-slate-100">{getRasiNumForHouse(7)}</span>
+            <div className="mb-4">
+              {renderHousePlanets(7)}
+            </div>
+          </div>
+
+          {/* Row 3, Cell 3: House 8 and 9 */}
+          <div className="relative p-2 overflow-hidden border border-slate-200">
+            {/* House 8 (Bottom-Left) */}
+            <div className="absolute bottom-1 left-2 flex flex-col items-center">
+              <span className="text-[10px] text-slate-400 font-bold bg-white px-1 rounded-full border border-slate-100">{getRasiNumForHouse(8)}</span>
+              {renderHousePlanets(8)}
+            </div>
+            {/* House 9 (Top-Right) */}
+            <div className="absolute top-1 right-2 flex flex-col items-center">
+              <span className="text-[10px] text-slate-400 font-bold bg-white px-1 rounded-full border border-slate-100">{getRasiNumForHouse(9)}</span>
+              {renderHousePlanets(9)}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // South Indian Chart
+  if (style === "south") {
+    const renderCell = (signName: string) => {
+      const ps = getPlanetsInSign(signName);
+      const isLagna = ps.some(p => p.name === "Ascendant" || p.name === "Asc" || p.name === "Lagna");
+      return (
+        <div key={signName} className="border border-purple-500/20 p-2 relative flex flex-col hover:bg-purple-500/5 transition-colors group bg-white">
+          <span className="text-[10px] text-muted-foreground absolute top-1 left-1 opacity-50">{SIGN_NUMBERS[signName]}</span>
+          <div className="flex flex-wrap gap-1 mt-4">
+            {ps.map((p, idx) => {
+              if (p.name === "Ascendant" || p.name === "Asc" || p.name === "Lagna") return null;
+              const color = PLANET_COLORS[p.name] || "#4f46e5";
+              return (
+                <span key={idx} onClick={(e) => { e.stopPropagation(); if (onPlanetClick) onPlanetClick(p); }} className="text-xs font-black cursor-pointer hover:scale-125 transition-transform" style={{ color }}>
+                  {getPlanetAbbreviation(p.name)}
+                </span>
+              );
+            })}
+          </div>
+          {isLagna && <div className="absolute top-1 right-1 font-bold text-xs bg-slate-100 border border-slate-300 rounded px-1 text-slate-700">{getPlanetAbbreviation("Ascendant")}</div>}
+        </div>
+      );
+    };
+
+    return (
+      <div className={cn("w-full aspect-square max-w-[500px] bg-[#FDFBF7] dark:bg-card border-2 border-purple-500 rounded-sm relative overflow-hidden shadow-inner font-body", className)}>
+        <div className="absolute inset-0 grid grid-cols-4 grid-rows-4">
+          {renderCell("Meena")}
+          {renderCell("Mesha")}
+          {renderCell("Vrishabha")}
+          {renderCell("Mithuna")}
+          
+          {renderCell("Kumbha")}
+          <div className="col-span-2 row-span-2 flex flex-col items-center justify-center border border-purple-500/20 p-4">
+            <h3 className="font-display text-2xl md:text-3xl font-bold text-purple-900/40 dark:text-purple-100/20">RASI</h3>
+          </div>
+          {renderCell("Karka")}
+          
+          {renderCell("Makara")}
+          {renderCell("Simha")}
+          
+          {renderCell("Dhanu")}
+          {renderCell("Vrischika")}
+          {renderCell("Tula")}
+          {renderCell("Kanya")}
+        </div>
+      </div>
+    );
+  }
+
+  // North Indian Chart
+  if (style === "north") {
+    // In North Indian chart, House 1 is always the top middle diamond.
+    // The houses go counter-clockwise: 1, 2, 3, ... 12.
+    // We map house numbers to signs.
+    const houses = Array.from({length: 12}, (_, i) => {
+      const houseNum = i + 1;
+      const signIndex = (lagnaIndex + houseNum - 1) % 12;
+      const signName = ZODIAC_SIGNS[signIndex];
+      return { houseNum, signName, signNumber: SIGN_NUMBERS[signName], planets: getPlanetsInSign(signName) };
+    });
+
+    const renderHouse = (index: number, x: string, y: string) => {
+      const h = houses[index];
+      const isLagna = h.planets.some(p => p.name === "Ascendant" || p.name === "Asc" || p.name === "Lagna");
+      return (
+        <div key={index} className="absolute flex flex-col items-center justify-center transform -translate-x-1/2 -translate-y-1/2 text-center" style={{ left: x, top: y, width: '25%', height: '25%' }}>
+          <span className="text-[10px] text-muted-foreground absolute top-0">{h.signNumber}</span>
+          <div className="flex flex-wrap justify-center gap-x-1 text-[11px] font-bold text-purple-900 dark:text-purple-300 mt-2">
+            {h.planets.map(p => {
+              const color = PLANET_COLORS[p.name] || "#4f46e5";
+              return (
+                <span key={p.name} onClick={(e) => { e.stopPropagation(); if (onPlanetClick) onPlanetClick(p); }} className="cursor-pointer hover:scale-125 transition-transform" style={{ color }}>{getPlanetAbbreviation(p.name)}</span>
+              );
+            })}
+          </div>
+        </div>
+      );
+    };
+
+    return (
+      <div className={cn("w-full aspect-square max-w-[500px] bg-[#FDFBF7] dark:bg-card border-2 border-purple-800 relative overflow-hidden mx-auto", className)}>
+        <svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none" className="absolute inset-0 stroke-purple-800 stroke-[0.5] fill-none">
+          <line x1="0" y1="0" x2="100" y2="100" />
+          <line x1="100" y1="0" x2="0" y2="100" />
+          <polygon points="50,0 100,50 50,100 0,50" />
+        </svg>
+        {/* Placements for 12 houses */}
+        {renderHouse(0, "50%", "25%")}   {/* H1 */}
+        {renderHouse(1, "25%", "15%")}   {/* H2 */}
+        {renderHouse(2, "15%", "25%")}   {/* H3 */}
+        {renderHouse(3, "25%", "50%")}   {/* H4 */}
+        {renderHouse(4, "15%", "75%")}   {/* H5 */}
+        {renderHouse(5, "25%", "85%")}   {/* H6 */}
+        {renderHouse(6, "50%", "75%")}   {/* H7 */}
+        {renderHouse(7, "75%", "85%")}   {/* H8 */}
+        {renderHouse(8, "85%", "75%")}   {/* H9 */}
+        {renderHouse(9, "75%", "50%")}   {/* H10 */}
+        {renderHouse(10, "85%", "25%")}  {/* H11 */}
+        {renderHouse(11, "75%", "15%")}  {/* H12 */}
+      </div>
+    );
+  }
+
+  // East Indian Chart
+  if (style === "east") {
+    // East Indian chart uses fixed zodiac positions.
+    const renderEastHouse = (signName: string, x: string, y: string, borderStyles: React.CSSProperties) => {
+      const ps = getPlanetsInSign(signName);
+      return (
+        <div key={signName} className="absolute flex flex-col items-center justify-center p-1" style={{ left: x, top: y, width: '33.33%', height: '33.33%', ...borderStyles }}>
+           <span className="text-[10px] text-muted-foreground absolute top-1 left-1 opacity-50">{SIGN_NUMBERS[signName]}</span>
+           <div className="flex flex-wrap justify-center gap-1 mt-2 text-[10px] font-bold text-purple-900 dark:text-purple-300">
+             {ps.map(p => {
+               const color = PLANET_COLORS[p.name] || "#4f46e5";
+               return (
+                 <span key={p.name} onClick={(e) => { e.stopPropagation(); if (onPlanetClick) onPlanetClick(p); }} className="cursor-pointer hover:scale-125 transition-transform" style={{ color }}>{getPlanetAbbreviation(p.name)}</span>
+               );
+             })}
+           </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className={cn("w-full aspect-square max-w-[500px] bg-[#FDFBF7] dark:bg-card border-2 border-purple-800 relative overflow-hidden mx-auto", className)}>
+         <svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none" className="absolute inset-0 stroke-purple-800 stroke-[0.5] fill-none">
+            {/* 3x3 Grid lines */}
+            <line x1="33.33" y1="0" x2="33.33" y2="100" />
+            <line x1="66.66" y1="0" x2="66.66" y2="100" />
+            <line x1="0" y1="33.33" x2="100" y2="33.33" />
+            <line x1="0" y1="66.66" x2="100" y2="66.66" />
+            
+            {/* Diagonals in corner boxes */}
+            <line x1="0" y1="33.33" x2="33.33" y2="0" />
+            <line x1="66.66" y1="0" x2="100" y2="33.33" />
+            <line x1="0" y1="66.66" x2="33.33" y2="100" />
+            <line x1="66.66" y1="100" x2="100" y2="66.66" />
+        </svg>
+        
+        {renderEastHouse("Mesha", "33.33%", "0%", {})}
+        {renderEastHouse("Vrishabha", "66.66%", "0%", { height: "16.66%", width: "33.33%", paddingTop: "0" })}
+        {renderEastHouse("Mithuna", "83.33%", "16.66%", { height: "33.33%", width: "16.66%" })}
+        {renderEastHouse("Karka", "66.66%", "33.33%", {})}
+        {renderEastHouse("Simha", "83.33%", "66.66%", { height: "33.33%", width: "16.66%" })}
+        {renderEastHouse("Kanya", "66.66%", "83.33%", { height: "16.66%", width: "33.33%" })}
+        {renderEastHouse("Tula", "33.33%", "66.66%", {})}
+        {renderEastHouse("Vrischika", "0%", "83.33%", { height: "16.66%", width: "33.33%" })}
+        {renderEastHouse("Dhanu", "0%", "66.66%", { height: "33.33%", width: "16.66%" })}
+        {renderEastHouse("Makara", "0%", "33.33%", {})}
+        {renderEastHouse("Kumbha", "0%", "16.66%", { height: "33.33%", width: "16.66%" })}
+        {renderEastHouse("Meena", "0%", "0%", { height: "16.66%", width: "33.33%" })}
+      </div>
+    );
+  }
+
+  return null;
+}

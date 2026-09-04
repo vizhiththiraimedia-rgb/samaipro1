@@ -255,6 +255,8 @@ class ProviderRegistry:
                     kind=config.metadata.get("kind", "openai_whisper") if config.metadata else "openai_whisper",
                 )
             elif provider_type == ProviderType.IMAGE:
+                metadata = config.metadata or {}
+                filtered_metadata = {k: v for k, v in metadata.items() if k not in ("kind", "provider_type")}
                 return ImageGenerationAdapter(
                     name=config.name,
                     api_key=config.api_key,
@@ -262,8 +264,8 @@ class ProviderRegistry:
                     model=config.model,
                     priority=config.priority,
                     provider_type=ProviderType.IMAGE,
-                    kind=config.metadata.get("kind", "openai_image") if config.metadata else "openai_image",
-                    **(config.metadata or {}),
+                    kind=metadata.get("kind", "openai_image"),
+                    **filtered_metadata,
                 )
             elif provider_type == ProviderType.LOCAL:
                 return LocalLLMAdapter(

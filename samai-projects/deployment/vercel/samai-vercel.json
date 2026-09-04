@@ -1,0 +1,26 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/next",
+      "root": "frontend"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/admin/(.*)",
+      "dest": "/frontend/$1"
+    },
+    {
+      "src": "/(.*)",
+      "headers": {"Location": "https://samai.com/$1"},
+      "permanent": false
+    }
+  ],
+  "env": {
+    "NEXT_PUBLIC_API_URL": "https://samai.com/api"
+  },
+  "cleanUrls": true,
+  "trailingSlash": false
+}

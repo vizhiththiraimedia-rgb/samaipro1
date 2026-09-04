@@ -10,7 +10,8 @@ import {
   MessageSquare, Briefcase, TrendingUp, Cpu, 
   Terminal, Image as ImageIcon, Mic, FileText, 
   Share2, Brain, Newspaper, BookOpen, MonitorPlay, 
-  Network, KeyRound, Database, Activity, ShieldAlert, Smartphone, Radio
+  Network, KeyRound, Database, Activity, ShieldAlert, Smartphone, Radio,
+  Sparkles, ShieldCheck
 } from "lucide-react";
 
 type Module = {
@@ -23,6 +24,7 @@ type Module = {
 };
 
 const modules: Module[] = [
+  { id: "security-auditor", title: "SAM Code Guardian", description: "AI-Powered Security Auditing & Vulnerability Patching.", icon: ShieldCheck, href: "/modules/security-auditor", color: "#10b981" },
   { id: "agency-workspace", title: "Enterprise Agency & Task Hub", description: "Multi-tier team management, $100 vs $40 Job Bidding, Client AI Proxy & A-to-Z Manuals.", icon: Briefcase, href: "/modules/agency-workspace", color: "#ec4899" },
   { id: "media-voice-studio", title: "Media & Voice Studio", description: "OmniVoice AI TTS and Universal video/media downloaders.", icon: Mic, href: "/modules/media-voice-studio", color: "#8b5cf6" },
   { id: "web-editor-ide", title: "Web Editor & IDE", description: "Cloud-based SAM Editor and Flutter Reconstruction environment.", icon: Code, href: "/modules/web-editor-ide", color: "#14b8a6" },
@@ -39,6 +41,7 @@ const modules: Module[] = [
   { id: "image", title: "AI Image Studio", description: "Generate prompts, edit images, resize, apply filters, and overlays.", icon: ImageIcon, href: "/modules/image", color: "#a855f7" },
   { id: "voice", title: "Voice Workspace", description: "Transcribe audio files, voice commands, and text-to-speech support.", icon: Mic, href: "/modules/voice", color: "#f97316" },
   { id: "pdf-translate", title: "PDF & Translation Engine", description: "Extract text from PDFs. Translate between Tamil, Sinhala, English.", icon: FileText, href: "/modules/pdf-translate", color: "#06b6d4" },
+  { id: "samtool", title: "SAM Toolbox", description: "Utility tools: PDF manipulation, QR codes, encoding, government services, invoicing.", icon: Sparkles, href: "/modules/samtool", color: "#10a37f" },
   { id: "flutter-studio", title: "Flutter AI Studio", description: "Compliance-First Visual Code Editor & App Reconstruction Engine.", icon: Smartphone, href: "/modules/flutter-studio", color: "#0ea5e9" },
   { id: "media", title: "Media & Content Studio", description: "Social media prompts, image/video generation prompts, resize guides.", icon: Share2, href: "/modules/media", color: "#ef4444" },
   { id: "learning", title: "Self Learning AI Brain", description: "SAM AI learns from your feedback and adapts to your personal style.", icon: Brain, href: "/modules/learning", color: "#10b981" },

@@ -12,9 +12,13 @@ const getBaseUrl = () => {
 
 export const getApiBaseUrl = () => getBaseUrl();
 
-export const getToken = () => {
+export const getToken = (): string | null => {
   if (typeof window !== 'undefined') {
-    return localStorage.getItem('token');
+    const local = localStorage.getItem('token');
+    if (!local || local.split('.').length < 3) {
+      return null;
+    }
+    return local;
   }
   return null;
 };
@@ -49,8 +53,13 @@ export const apiFetch = async (endpoint: string, options: RequestInit = {}) => {
     headers['Content-Type'] = 'application/json';
   }
 
-  if (token) {
+  if (token && !headers['Authorization']) {
     headers['Authorization'] = `Bearer ${token}`;
+  }
+
+  if (!token && typeof window !== 'undefined' && window.location.pathname !== '/login') {
+    window.location.href = '/login';
+    throw new Error('Not authenticated');
   }
 
   const url = baseUrl ? `${baseUrl}${targetEndpoint}` : targetEndpoint;
@@ -76,6 +85,14 @@ export const apiFetch = async (endpoint: string, options: RequestInit = {}) => {
     } catch {
       const rawText = await response.text().catch(() => '');
       errorMessage = `Server Error (${response.status}): ${rawText.substring(0, 100)}`;
+    }
+
+    if (response.status === 401) {
+      removeToken();
+      if (typeof window !== 'undefined') {
+        // Optionally redirect to login, but removing the token is enough for the next refresh to use master key
+        console.warn("Auth failed, token cleared.");
+      }
     }
     throw new Error(errorMessage || `Server returned HTTP ${response.status}`);
   }

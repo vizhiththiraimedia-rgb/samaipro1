@@ -7,9 +7,14 @@ from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(title="SAM AI Engine", version="1.0.0")
 
+ALLOWED_ORIGINS = [
+    o.strip() for o in os.getenv("ALLOWED_ORIGINS", "https://samai.lk,https://www.samai.lk,https://samaipro.vercel.app").split(",") if o.strip()
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origin_regex=r".*",
+    allow_origins=ALLOWED_ORIGINS,
+    allow_origin_regex=os.getenv("ALLOWED_ORIGIN_REGEX"),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

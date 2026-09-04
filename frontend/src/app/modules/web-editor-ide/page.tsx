@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { 
   Code, MonitorPlay, Braces, Play, Download, Copy, Check, 
   Smartphone, ArrowLeft, RefreshCw, Layers, Sparkles, Terminal,
-  Maximize2, Minimize2, ExternalLink, Globe
+  Maximize2, Minimize2, ExternalLink, Globe, Server
 } from 'lucide-react';
 
 const STARTER_TEMPLATES: Record<string, string> = {
@@ -150,6 +150,37 @@ export default function WebEditorIDE() {
   const [copied, setCopied] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [previewKey, setPreviewKey] = useState(0);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    // Optionally auto-run or load from cloud
+    const loadCode = async () => {
+      try {
+        const { apiFetch } = await import("../../../utils/api");
+        const res = await apiFetch("/web-editor/code");
+        if (res.code) {
+          setCode(res.code);
+          setPreviewKey(prev => prev + 1);
+        }
+      } catch (e) {}
+    };
+    loadCode();
+  }, []);
+
+  const handleSaveToCloud = async () => {
+    setSaving(true);
+    try {
+      const { apiFetch } = await import("../../../utils/api");
+      await apiFetch("/web-editor/save", {
+        method: "POST",
+        body: JSON.stringify({ code })
+      });
+      alert("Code saved to cloud successfully!");
+    } catch (e) {
+      alert("Failed to save.");
+    }
+    setSaving(false);
+  };
 
   const handleCopy = () => {
     navigator.clipboard.writeText(code);
@@ -250,6 +281,15 @@ export default function WebEditorIDE() {
           >
             <Play size={13} fill="#fff" /> Run & Refresh
           </button>
+          
+          <button
+            onClick={handleSaveToCloud}
+            disabled={saving}
+            style={{ display: "flex", alignItems: "center", gap: "6px", background: "#f59e0b", color: "#000", border: "none", padding: "6px 14px", borderRadius: "6px", fontSize: "0.8rem", fontWeight: 700, cursor: "pointer" }}
+          >
+            <Server size={13} /> {saving ? "Saving..." : "Save Code to DB"}
+          </button>
+
           <button
             onClick={handleCopy}
             style={{ display: "flex", alignItems: "center", gap: "6px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "#d1d5db", padding: "6px 10px", borderRadius: "6px", fontSize: "0.8rem", cursor: "pointer" }}

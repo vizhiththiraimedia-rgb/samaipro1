@@ -20,42 +20,47 @@ async def autonomous_agent_pipeline(goal: str, context: str):
     yield f"data: {json.dumps({'agent': 'planner', 'agent_progress': 25, 'overall': 10, 'status': 'Analyzing goal requirements...', 'log': '[Planner] Parsing intent and architectural scope...'})}\n\n"
     await asyncio.sleep(1.0)
     
+    from api_hub import api_hub
+    
     planner_prompt = "You are the Master AI Planner Agent. Deconstruct the user's mission goal into high-level architectural requirements, components, and execution milestones. Output concise, professional bullet points."
     planner_input = f"Goal: {goal}\nContext: {context}"
     try:
-        plan = get_ai_response(user_message=planner_input, system_prompt=planner_prompt)
+        res = await api_hub.chat([{"role": "system", "content": planner_prompt}, {"role": "user", "content": planner_input}], max_tokens=1500)
+        plan = res["content"]
     except Exception:
         plan = f"• Analyzed requirement for: {goal}\n• Microservices & API Architecture planned.\n• Frontend & Backend interfaces mapped."
 
     yield f"data: {json.dumps({'agent': 'planner', 'agent_progress': 100, 'overall': 20, 'status': 'Plan Finalized', 'log': '[Planner] Architecture & execution milestones generated.', 'plan': plan})}\n\n"
     await asyncio.sleep(0.8)
 
-    # ── Agent 2: Deep Research Agent ──
+    # 🤖 Agent 2: Deep Research Agent 🤖
     yield f"data: {json.dumps({'agent': 'research', 'agent_progress': 30, 'overall': 30, 'status': 'Researching best libraries & APIs...', 'log': '[Research] Benchmarking CoinGecko/WebRTC/LLM APIs and dependencies...'})}\n\n"
     await asyncio.sleep(1.2)
     
     research_prompt = "You are the Deep Research Agent. Recommend the optimal tech stack, APIs, and libraries for this project. Keep it concise in 1 short paragraph."
     try:
-        research = get_ai_response(user_message=f"Goal: {goal}\nPlan: {plan}", system_prompt=research_prompt)
+        res = await api_hub.chat([{"role": "system", "content": research_prompt}, {"role": "user", "content": f"Goal: {goal}\nPlan: {plan}"}], max_tokens=1000)
+        research = res["content"]
     except Exception:
         research = f"Optimal Stack: Next.js 14, Tailwind CSS, TypeScript, FastAPI, WebSockets & Server-Sent Events."
 
     yield f"data: {json.dumps({'agent': 'research', 'agent_progress': 100, 'overall': 40, 'status': 'Research Complete', 'log': '[Research] Tech stack & API contracts validated.', 'research': research})}\n\n"
     await asyncio.sleep(0.8)
 
-    # ── Agent 3: UI / UX Designer ──
+    # 🤖 Agent 3: UI / UX Designer 🤖
     yield f"data: {json.dumps({'agent': 'ui', 'agent_progress': 40, 'overall': 50, 'status': 'Designing Dark-Theme Layout...', 'log': '[UI/UX] Generating wireframes, layout grids and neon accent palette...'})}\n\n"
     await asyncio.sleep(1.2)
     yield f"data: {json.dumps({'agent': 'ui', 'agent_progress': 100, 'overall': 60, 'status': 'Layout Approved', 'log': '[UI/UX] Responsive components and interactive state designs ready.'})}\n\n"
     await asyncio.sleep(0.8)
 
-    # ── Agent 4: Full-Stack Developer Agent ──
+    # 🤖 Agent 4: Full-Stack Developer Agent 🤖
     yield f"data: {json.dumps({'agent': 'developer', 'agent_progress': 35, 'overall': 70, 'status': 'Writing Production Code...', 'log': '[Developer] Synthesizing TypeScript / Python modules and API hooks...'})}\n\n"
     await asyncio.sleep(1.5)
     
     dev_prompt = "You are the Senior Full-Stack Developer Agent. Write production-quality code (React/TypeScript or Python) solving the user's goal. Include clear, working code with styling."
     try:
-        code = get_ai_response(user_message=f"Goal: {goal}\nStack: {research}\nContext: {context}", system_prompt=dev_prompt)
+        res = await api_hub.chat([{"role": "system", "content": dev_prompt}, {"role": "user", "content": f"Goal: {goal}\nStack: {research}\nContext: {context}"}], max_tokens=3000)
+        code = res["content"]
     except Exception:
         code = f"// SAM AI Autonomous Code Output for {goal}\nimport React, {{ useState, useEffect }} from 'react';\n\nexport default function App() {{\n  const [status, setStatus] = useState('Active');\n  return (\n    <div className='p-6 bg-slate-900 text-white rounded-xl'>\n      <h1 className='text-2xl font-bold'>Crypto Live Dashboard</h1>\n      <p>Status: {{status}}</p>\n    </div>\n  );\n}}"
 

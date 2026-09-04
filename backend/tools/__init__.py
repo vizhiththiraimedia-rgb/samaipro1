@@ -385,11 +385,18 @@ class CalculatorTool(Tool):
     description = "Perform mathematical calculations"
     
     def execute(self, expression: str) -> Dict[str, Any]:
+        import ast
         try:
-            allowed = set("0123456789+-*/(). ")
-            if not all(c in allowed for c in expression):
-                return {"tool": self.name, "error": "Invalid characters in expression"}
-            result = eval(expression)
+            tree = ast.parse(expression, mode="eval")
+            allowed_nodes = (
+                ast.Expression, ast.BinOp, ast.UnaryOp, ast.Num, ast.Constant,
+                ast.Add, ast.Sub, ast.Mult, ast.Div, ast.FloorDiv, ast.Mod,
+                ast.Pow, ast.USub, ast.UAdd, ast.Load
+            )
+            for node in ast.walk(tree):
+                if not isinstance(node, allowed_nodes):
+                    return {"tool": self.name, "error": "Disallowed expression element"}
+            result = eval(compile(tree, "<calc>", "eval"))
             return {"tool": self.name, "expression": expression, "result": result}
         except Exception as e:
             return {"tool": self.name, "expression": expression, "error": str(e)}

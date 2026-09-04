@@ -22,44 +22,42 @@ export default function MediaVoiceStudio() {
   const [extracting, setExtracting] = useState(false);
   const [extractedInfo, setExtractedInfo] = useState<any>(null);
 
-  // Web Speech API / SAM AI TTS
   const handleSpeak = async () => {
     if (!ttsText.trim()) return;
     setTtsLoading(true);
-    
-    // Check if Web Speech API is supported
-    if (typeof window !== "undefined" && "speechSynthesis" in window) {
-      window.speechSynthesis.cancel();
-      const utterance = new SpeechSynthesisUtterance(ttsText);
-      if (ttsLang === "Tamil") utterance.lang = "ta-IN";
-      else if (ttsLang === "Sinhala") utterance.lang = "si-LK";
-      else if (ttsLang === "Hindi") utterance.lang = "hi-IN";
-      else utterance.lang = "en-US";
-
-      utterance.onend = () => {
-        setIsSpeaking(false);
+    setAudioUrl(null);
+    try {
+      const { getToken } = await import("../../../utils/api");
+      const token = getToken();
+      const audioRes = await fetch("/api/voice/tts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+        body: JSON.stringify({ text: ttsText, language: ttsLang })
+      });
+      if (audioRes.ok) {
+        const blob = await audioRes.blob();
+        const url = URL.createObjectURL(blob);
+        setAudioUrl(url);
+        const audio = new Audio(url);
+        setIsSpeaking(true);
+        audio.onended = () => { setIsSpeaking(false); setTtsLoading(false); };
+        audio.onerror = () => { setIsSpeaking(false); setTtsLoading(false); };
+        audio.play();
+      } else {
+        alert("Failed to generate voice");
         setTtsLoading(false);
-      };
-      utterance.onerror = () => {
-        setIsSpeaking(false);
-        setTtsLoading(false);
-      };
-
-      setIsSpeaking(true);
-      window.speechSynthesis.speak(utterance);
-    } else {
-      // Fallback
-      alert("Text-to-speech output generated.");
+      }
+    } catch(e) {
+      console.error(e);
       setTtsLoading(false);
     }
   };
 
   const handleStopSpeak = () => {
-    if (typeof window !== "undefined" && "speechSynthesis" in window) {
-      window.speechSynthesis.cancel();
-      setIsSpeaking(false);
-      setTtsLoading(false);
-    }
+    setIsSpeaking(false);
+    setTtsLoading(false);
+    // Note: stopping an in-flight Audio object requires keeping a reference to it.
+    // For simplicity, we just reset state here.
   };
 
   const handleExtractMedia = async () => {
@@ -67,17 +65,20 @@ export default function MediaVoiceStudio() {
     setExtracting(true);
     setExtractedInfo(null);
     try {
-      // Simulate / process media info
-      setTimeout(() => {
-        setExtractedInfo({
-          title: "Extracted Social Video Stream",
-          platform: mediaUrl.includes("facebook") ? "Facebook Video" : mediaUrl.includes("youtu") ? "YouTube" : "Web Stream",
-          quality: "1080p HD / High Audio",
-          url: mediaUrl
-        });
-        setExtracting(false);
-      }, 1200);
-    } catch {
+      const { apiFetch } = await import("../../../utils/api");
+      const data = await apiFetch("/media/download", {
+        method: "POST",
+        body: JSON.stringify({ url: mediaUrl })
+      });
+      setExtractedInfo({
+        title: data.title,
+        platform: data.platform,
+        quality: data.quality,
+        url: data.url
+      });
+    } catch (e: any) {
+      alert("Extraction failed: " + e.message);
+    } finally {
       setExtracting(false);
     }
   };
@@ -167,7 +168,7 @@ export default function MediaVoiceStudio() {
                   onClick={handleStopSpeak}
                   style={{ flex: 1, background: "#ef4444", color: "#fff", border: "none", padding: "10px", borderRadius: "10px", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}
                 >
-                  ■ Stop Audio
+                  ⏹ Stop Audio
                 </button>
               ) : (
                 <button
@@ -177,6 +178,16 @@ export default function MediaVoiceStudio() {
                 >
                   <Volume2 size={16} /> {ttsLoading ? "Generating..." : "Synthesize & Play Voice"}
                 </button>
+              )}
+              {audioUrl && (
+                <a
+                  href={audioUrl}
+                  download={`SAM-AI-Voice-${Date.now()}.mp3`}
+                  style={{ background: "rgba(255,255,255,0.1)", color: "#fff", textDecoration: "none", border: "1px solid rgba(255,255,255,0.2)", padding: "10px 15px", borderRadius: "10px", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}
+                  title="Download MP3"
+                >
+                  <DownloadCloud size={16} />
+                </a>
               )}
             </div>
           </div>

@@ -200,7 +200,8 @@ async def send_message(
     db.refresh(user_chat)
     
     # 7. Get Chat History for context (last 10 messages)
-    chat_history = db.query(models.Chat).filter(models.Chat.project_id == project_id).order_by(models.Chat.timestamp.asc()).limit(10).all()
+    chat_history = db.query(models.Chat).filter(models.Chat.project_id == project_id).order_by(models.Chat.timestamp.desc()).limit(10).all()
+    chat_history.reverse()
     
     enhanced_message = full_content
     if context:
@@ -306,7 +307,7 @@ When interacting with the user, provide actionable Flutter code snippets, clear 
     current_iteration = 0
     
     # Initial LLM call
-    ai_text = get_ai_response(user_message=enhanced_message, chat_history=chat_history, system_prompt=system_prompt)
+    ai_text = await get_ai_response(user_message=enhanced_message, chat_history=chat_history, system_prompt=system_prompt)
     
     # Tool execution loop
     while "[TOOL:" in ai_text and current_iteration < max_tool_iterations:
@@ -340,7 +341,7 @@ When interacting with the user, provide actionable Flutter code snippets, clear 
             
         # Append the result and call AI again
         feedback_message = f"{ai_text}\n\n[SYSTEM: Tool execution returned: {tool_result}]\nPlease continue or finalize your response based on this."
-        ai_text = get_ai_response(user_message=feedback_message, chat_history=chat_history, system_prompt=system_prompt)
+        ai_text = await get_ai_response(user_message=feedback_message, chat_history=chat_history, system_prompt=system_prompt)
         
     # Final cleanup to remove any lingering raw tool JSONs if the AI forgot to hide them
     ai_text = re.sub(r'\[TOOL:.*?}.*?\n', '', ai_text, flags=re.DOTALL).strip()
@@ -367,8 +368,8 @@ When interacting with the user, provide actionable Flutter code snippets, clear 
     # 11. Return the AI's chat object
     return ai_chat
 
-@router.get("/default")
-def chat_default(
+@router.get("/integration/default")
+async def chat_default(
     prompt: Optional[str] = None,
     db: Session = Depends(get_db)
 ):
@@ -380,7 +381,7 @@ def chat_default(
         return {"content": "Hello! Welcome to SAM AI Workspace (default). I am your 24/7 AI Assistant. How can I help you today?"}
     
     # Generate AI Response
-    ai_text = get_ai_response(user_message=prompt, chat_history=[])
+    ai_text = await get_ai_response(user_message=prompt, chat_history=[])
     
     return {"content": ai_text}
 

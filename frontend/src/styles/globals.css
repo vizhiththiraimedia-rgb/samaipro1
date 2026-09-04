@@ -1,0 +1,85 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Abhaya+Libre:wght@400;500;600;700;800&family=Noto+Sans+Sinhala:wght@400;500;600;700&family=Noto+Serif+Sinhala:wght@400;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 48 100% 96%; /* Creamy off-white/beige */
+    --foreground: 20 20% 20%; /* Dark text */
+    --card: 0 0% 100%; /* White cards */
+    --card-foreground: 20 20% 20%;
+    --primary: 353 74% 41%; /* Deep Maroon/Red */
+    --primary-foreground: 0 0% 100%; /* White text on primary */
+    --secondary: 45 100% 58%; /* Golden Yellow */
+    --secondary-foreground: 0 0% 10%; /* Dark text on secondary */
+    --muted: 48 30% 90%;
+    --muted-foreground: 20 10% 40%;
+    --accent: 45 100% 58%; /* Golden Yellow for accents */
+    --accent-foreground: 0 0% 10%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 48 20% 85%;
+    --input: 48 20% 85%;
+    --ring: 353 74% 41%; /* Focus ring matches primary maroon */
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    --background: 48 100% 96%; /* Creamy off-white/beige */
+    --foreground: 20 20% 20%; /* Dark text */
+    --card: 0 0% 100%; /* White cards */
+    --card-foreground: 20 20% 20%;
+    --primary: 353 74% 41%; /* Deep Maroon/Red */
+    --primary-foreground: 0 0% 100%; /* White text on primary */
+    --secondary: 45 100% 58%; /* Golden Yellow */
+    --secondary-foreground: 0 0% 10%; /* Dark text on secondary */
+    --muted: 48 30% 90%;
+    --muted-foreground: 20 10% 40%;
+    --accent: 45 100% 58%; /* Golden Yellow for accents */
+    --accent-foreground: 0 0% 10%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 48 20% 85%;
+    --input: 48 20% 85%;
+    --ring: 353 74% 41%; /* Focus ring matches primary maroon */
+  }
+}
+
+@layer base {
+  * {
+    border-color: hsl(var(--border));
+  }
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-family: 'Inter', 'Noto Sans Sinhala', 'Abhaya Libre', sans-serif;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  .cosmic-gradient {
+    background: linear-gradient(135deg, hsl(262.1 83.3% 57.8%), hsl(280 83.3% 57.8%), hsl(300 83.3% 57.8%));
+  }
+  .gold-gradient {
+    background: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .elegant-sinhala {
+    font-family: 'Abhaya Libre', 'Noto Serif Sinhala', serif;
+  }
+}

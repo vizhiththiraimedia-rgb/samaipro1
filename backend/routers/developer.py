@@ -62,7 +62,7 @@ async def edit_module(
     user_message = f"User Request: {prompt}\n\nCodebase Context:\n{code_context}"
     
     try:
-        ai_response = get_ai_response(user_message, [], system_prompt=system_prompt)
+        ai_response = await get_ai_response(user_message, [], system_prompt=system_prompt)
         
         # Clean markdown if AI accidentally included it
         ai_response = re.sub(r'^```[a-z]*\s*', '', ai_response.strip())

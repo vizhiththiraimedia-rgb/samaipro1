@@ -18,20 +18,55 @@ async def run_agent_task(
     task: str = Form(...),
     context: str = Form(None),
     use_planning: bool = Form(True),
+    agent_name: str = Form(None),
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user)
 ):
     """Run a task through the autonomous agent system"""
+    import time
+    from ai_engine import get_ai_response
+    
     context_dict = {}
     if context:
         try:
             context_dict = json.loads(context)
         except:
             context_dict = {"raw_context": context}
-    
+            
     try:
-        result = await agent_router.route_task(task, context_dict, use_planning)
-        return result
+        if agent_name:
+            # Use specific DB Agent
+            agent = db.query(models.AgentRoster).filter(models.AgentRoster.name == agent_name).first()
+            if not agent:
+                raise HTTPException(status_code=404, detail="Agent not found")
+            
+            start_time = time.time()
+            
+            from api_hub import api_hub
+            messages = [
+                {"role": "system", "content": agent.system_prompt},
+                {"role": "user", "content": f"Context: {json.dumps(context_dict)}\n\nTask: {task}"}
+            ]
+            try:
+                hub_result = await api_hub.chat(messages)
+                result_text = hub_result.get("content", "No content returned.")
+            except Exception as e:
+                result_text = f"Agent Execution Error: {str(e)}"
+                
+            execution_time = time.time() - start_time
+            
+            return {
+                "task_id": "run-db-agent",
+                "status": "Completed",
+                "result": result_text,
+                "agent_used": agent.name,
+                "execution_time": execution_time,
+                "mode": "specialized"
+            }
+        else:
+            # Original auto-routing logic
+            result = await agent_router.route_task(task, context_dict, use_planning)
+            return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Agent execution failed: {str(e)}")
 
@@ -95,3 +130,21 @@ async def run_council_debate(
     task = AgentTask(id="council-task", description=topic)
     res = await council.execute(task, context={"provider": provider, "model": model})
     return res
+@router.post("/save-plan")
+async def save_agent_plan(
+    title: str = Form(...),
+    content: str = Form(...),
+    agent_name: str = Form(None),
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user)
+):
+    import json
+    doc = models.ProjectDocumentDB(
+        project_id="agency-workspace",
+        doc_id=models.generate_uuid(),
+        text=content,
+        metadata_json=json.dumps({"title": title, "agent": agent_name, "type": "agent_plan"})
+    )
+    db.add(doc)
+    db.commit()
+    return {"status": "success", "doc_id": doc.doc_id}

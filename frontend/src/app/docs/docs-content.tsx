@@ -224,12 +224,12 @@ export default function DocsContent() {
             <CodeBlock code={`# Login to get JWT token\nPOST https://samaipro.vercel.app/api/auth/login\n\nRequest Body:\n{\n  "email": "your@email.com",\n  "password": "yourpassword"\n}\n\nResponse:\n{\n  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",\n  "token_type": "bearer",\n  "user": { "id": 1, "email": "your@email.com" }\n}`} id="auth-example" />
 
             <h3 style={{ fontSize: "1.1rem", marginTop: "1.5rem", marginBottom: "0.8rem" }}>Using the Token:</h3>
-            <CodeBlock code={`# Include token in all API requests:\ncurl -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \\\n     https://samaipro.vercel.app/api/chat/default\n\n# Guest Mode (no auth needed):\nAuthorization: Bearer guest_master_token_2026`} id="auth-usage" />
+            <CodeBlock code={`# Include token in all API requests:\ncurl -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \\\n     https://samaipro.vercel.app/api/chat/default`} id="auth-usage" />
 
-            <div style={{ marginTop: "1.5rem", background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.3)", borderRadius: "10px", padding: "1rem 1.2rem" }}>
-              <strong style={{ color: "#f59e0b" }}>💡 Guest Token:</strong>
+            <div style={{ marginTop: "1.5rem", background: "rgba(99,102,241,0.1)", border: "1px solid rgba(99,102,241,0.3)", borderRadius: "10px", padding: "1rem 1.2rem" }}>
+              <strong style={{ color: "#818cf8" }}>Note:</strong>
               <p style={{ color: "var(--text-muted)", marginTop: "0.3rem", fontSize: "0.9rem" }}>
-                Use <code style={{ color: "#f59e0b" }}>guest_master_token_2026</code> to access read-only endpoints without registration.
+                All endpoints require a valid JWT obtained via <code>/api/auth/login</code> or an active access key via the <code>x-api-key</code> header.
               </p>
             </div>
           </div>

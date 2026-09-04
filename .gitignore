@@ -1,12 +1,15 @@
 # Dependencies
 node_modules/
 venv/
+.venv/
 __pycache__/
+*.pyc
+*.pyo
 
-# Environment
+# Environment secrets — NEVER commit
 .env
-.env.local
-.env.*.local
+.env.*
+!.env.example
 
 # Build outputs
 .next/
@@ -17,6 +20,7 @@ build/
 # Database
 *.db
 *.sqlite
+*.sqlite3
 
 # IDE
 .vscode/
@@ -27,6 +31,7 @@ build/
 # OS
 .DS_Store
 Thumbs.db
+desktop.ini
 
 # Logs
 logs/
@@ -35,21 +40,53 @@ npm-debug.log*
 
 # Testing
 coverage/
+.pytest_cache/
 
-.vercel
+# Deployment archives (never commit)
 *.zip
-*.db
-*.sqlite
+*.tar.gz
+*.rar
+*.7z
+*.iso
 
-samaicoder/
+# Junk directories
+.vercel/
+dummy-app/
+scratch/
+test_unzip/
+tst/
+cpanel_deploy_package/
 astrology_data/
 jothisaimages/
-super_app_projects/
-dummy-app/
+jothis.zip
+samaicoder.zip
+samaicoder/
 samai-assistant-mobile/
-cpanel_deploy_package/
-scratch/
-test_read.py
+super_app_projects/
+super_app_projects.zip
+samai_cpanel_deploy_no_modules.zip
+
+# Backend dev/fix scripts (not production)
+backend/fix_*.py
+backend/add_*.py
+backend/check_*.py
+backend/test_*.py
+backend/attach_*.py
+backend/crop_assets.py
+backend/create_test_key.py
 backend/gen_prompt.py
-backend/inject*.py
-backend/inject*.cjs
+backend/import_agents.py
+backend/inject_*.py
+backend/make_package.py
+backend/populate_knowledge.py
+
+# Stray root scripts
+fix.py
+test_endpoint.py
+test_read.py
+demo_result.txt
+
+# Local overrides
+samaicoder/.next/
+samai-assistant-mobile/android/.gradle/
+samai-assistant-mobile/ios/Pods/

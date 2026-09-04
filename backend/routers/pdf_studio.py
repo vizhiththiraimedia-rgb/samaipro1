@@ -48,7 +48,7 @@ async def pdf_chat(
     )
     
     try:
-        response = get_ai_response(user_message=prompt, system_prompt=system_prompt)
+        response = await get_ai_response(user_message=prompt, system_prompt=system_prompt)
         return {"status": "success", "response": response}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"AI Chat failed: {str(e)}")
@@ -73,13 +73,13 @@ async def pdf_summary(
     user_prompt = f"Please summarize this document:\n\n{document_text[:30000]}"
     
     try:
-        response = get_ai_response(user_message=user_prompt, system_prompt=system_prompt)
+        response = await get_ai_response(user_message=user_prompt, system_prompt=system_prompt)
         return {"status": "success", "response": response}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"AI Summary failed: {str(e)}")
 
 @router.post("/rewrite")
-def pdf_rewrite(
+async def pdf_rewrite(
     selected_text: str = Form(...),
     style: str = Form("Professional"),
     db = Depends(get_db),
@@ -93,7 +93,7 @@ def pdf_rewrite(
     )
     
     try:
-        response = get_ai_response(user_message=selected_text, system_prompt=system_prompt)
+        response = await get_ai_response(user_message=selected_text, system_prompt=system_prompt)
         return {"status": "success", "response": response.strip()}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"AI Rewrite failed: {str(e)}")

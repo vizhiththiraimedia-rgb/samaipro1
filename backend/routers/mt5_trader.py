@@ -94,18 +94,45 @@ def trade_worker():
         if not tick:
             time.sleep(5)
             continue
-        trading_state["logs"].append(f"[{strat.upper()}] Scanning {sym} | Current Price: {tick.ask}")
-        
-        if random.random() > 0.85:
-            direction = "BUY" if random.random() > 0.5 else "SELL"
-            order_type = mt5.ORDER_TYPE_BUY if direction == "BUY" else mt5.ORDER_TYPE_SELL
-            trading_state["logs"].append(f"🔥 {strat.upper()} Setup found! Executing {direction}...")
-            res = execute_trade(sym, trading_state["lot_size"], order_type, 150, 300)
-            if res and res.retcode == mt5.TRADE_RETCODE_DONE:
-                trading_state["logs"].append(f"✅ Trade Placed! Ticket: {res.order}")
-            else:
-                err = res.comment if res else 'Unknown'
-                trading_state["logs"].append(f"❌ Trade Failed: {err}")
+            
+        if strat == "hft_pullback":
+            trading_state["logs"].append(f"[{strat.upper()}] Analyzing EMA/RSI for {sym} at {tick.ask}")
+            rates = mt5.copy_rates_from_pos(sym, mt5.TIMEFRAME_H1, 0, 300)
+            if rates is not None and len(rates) > 200:
+                df = pd.DataFrame(rates)
+                df['ema20'] = calculate_ema(df['close'], 20)
+                df['ema50'] = calculate_ema(df['close'], 50)
+                df['ema200'] = calculate_ema(df['close'], 200)
+                df['rsi'] = calculate_rsi(df['close'], 14)
+                
+                curr = df.iloc[-1]
+                prev = df.iloc[-2]
+                
+                # BUY Logic: EMA20 > EMA50 > EMA200 & Price touched EMA20/50 & RSI > 50
+                if curr['ema20'] > curr['ema50'] > curr['ema200'] and curr['close'] > curr['ema200']:
+                    if (curr['low'] <= curr['ema20'] or curr['low'] <= curr['ema50']) and curr['close'] > curr['ema50']:
+                        if prev['rsi'] < 50 and curr['rsi'] > 50 and curr['close'] > curr['open']:
+                            trading_state["logs"].append(f"🟢 HFT BUY Signal! Executing...")
+                            execute_trade(sym, trading_state["lot_size"], mt5.ORDER_TYPE_BUY, 200, 400)
+                            
+                # SELL Logic: EMA20 < EMA50 < EMA200 & Price touched EMA20/50 & RSI < 50
+                elif curr['ema20'] < curr['ema50'] < curr['ema200'] and curr['close'] < curr['ema200']:
+                    if (curr['high'] >= curr['ema20'] or curr['high'] >= curr['ema50']) and curr['close'] < curr['ema50']:
+                        if prev['rsi'] > 50 and curr['rsi'] < 50 and curr['close'] < curr['open']:
+                            trading_state["logs"].append(f"🔴 HFT SELL Signal! Executing...")
+                            execute_trade(sym, trading_state["lot_size"], mt5.ORDER_TYPE_SELL, 200, 400)
+        else:
+            trading_state["logs"].append(f"[{strat.upper()}] Scanning {sym} | Current Price: {tick.ask}")
+            if random.random() > 0.85:
+                direction = "BUY" if random.random() > 0.5 else "SELL"
+                order_type = mt5.ORDER_TYPE_BUY if direction == "BUY" else mt5.ORDER_TYPE_SELL
+                trading_state["logs"].append(f"🎯 {strat.upper()} Setup found! Executing {direction}...")
+                res = execute_trade(sym, trading_state["lot_size"], order_type, 150, 300)
+                if res and res.retcode == mt5.TRADE_RETCODE_DONE:
+                    trading_state["logs"].append(f"✅ Trade Placed! Ticket: {res.order}")
+                else:
+                    err = res.comment if res else 'Unknown'
+                    trading_state["logs"].append(f"❌ Trade Failed: {err}")
                 
         time.sleep(10)
         if len(trading_state["logs"]) > 15: trading_state["logs"].pop(0)
@@ -132,3 +159,23 @@ def stop_trading():
     trading_state["is_running"] = False
     trading_state["logs"].append("🛑 Trading stopped.")
     return {"status": "Stopped"}
+import pandas as pd
+import numpy as np
+
+def calculate_ema(prices, days):
+    return prices.ewm(span=days, adjust=False).mean()
+
+def calculate_rsi(prices, periods=14):
+    delta = prices.diff()
+    gain = (delta.where(delta > 0, 0)).rolling(window=periods).mean()
+    loss = (-delta.where(delta < 0, 0)).rolling(window=periods).mean()
+    rs = gain / loss
+    return 100 - (100 / (1 + rs))
+
+def calculate_atr(df, periods=14):
+    high_low = df['high'] - df['low']
+    high_close = np.abs(df['high'] - df['close'].shift())
+    low_close = np.abs(df['low'] - df['close'].shift())
+    ranges = pd.concat([high_low, high_close, low_close], axis=1)
+    true_range = np.max(ranges, axis=1)
+    return true_range.rolling(periods).mean()

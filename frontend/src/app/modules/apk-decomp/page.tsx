@@ -74,27 +74,53 @@ export default function ApkDecompPage() {
     }
 
     setStatus("analyzing");
-    addLog(`[SCAN] Parsing smali and Java source trees...`);
+    addLog(`[SCAN] Hitting SAM AI APK Decompiler Engine...`);
+    
+    let realApkData = null;
+    try {
+      const { apiFetch } = await import("../../../utils/api");
+      const formData = new FormData();
+      formData.append("file", file);
+      const analyzeRes = await apiFetch("/apk-decomp/analyze", {
+        method: "POST",
+        body: formData
+      });
+      if (analyzeRes.data) {
+        realApkData = analyzeRes.data;
+        addLog(`[INFO] Successfully parsed APK Manifest & Metadata!`);
+      }
+    } catch (err: any) {
+      addLog(`[WARN] Backend analysis failed, proceeding with generic AI analysis. ${err.message}`);
+    }
+
     await new Promise(r => setTimeout(r, 1500));
     addLog(`[AI] Handing off decompiled payload to AtoZ-DecompEngine LLM...`);
 
     // Hit actual backend AI for the security report
     let aiReport = "";
     try {
+      const { getApiBaseUrl } = await import("../../../utils/api");
       const formData = new FormData();
-      formData.append("content", `Generate a detailed APK security analysis report for the app "${file.name}". Include: 1) Application Metadata & Tech Stack 2) Critical Security Findings & Leaked Secrets (in a markdown table) 3) Architecture & Entry Points 4) Refactoring & Security Recommendations. Make it realistic and professional.`);
+      let prompt = `Generate a detailed APK security analysis report for the app "${file.name}". `;
+      if (realApkData) {
+        prompt += `\nHere is the exact parsed data from androguard:\nPackage: ${realApkData.package_name}\nVersion Name: ${realApkData.version_name}\nVersion Code: ${realApkData.version_code}\nPermissions: ${realApkData.permissions?.join(", ")}\nActivities: ${realApkData.activities?.join(", ")}\n`;
+      }
+      prompt += `Include: 1) Application Metadata & Tech Stack 2) Critical Security Findings & Leaked Secrets (in a markdown table) 3) Architecture & Entry Points 4) Refactoring & Security Recommendations. Make it realistic and professional based on the permissions.`;
+      
+      formData.append("content", prompt);
       formData.append("mode", "apk_decomp");
 
       const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-      const res = await fetch("/api/chat/default", {
+      const res = await fetch(`${getApiBaseUrl()}/chat/default`, {
         method: "POST",
         headers: token ? { Authorization: `Bearer ${token}` } : {},
         body: formData,
       });
+      
       const data = await res.json();
-      aiReport = data.content || data.message || "";
-    } catch (err) {
-      addLog(`[WARN] AI Backend unreachable. Using built-in static analysis engine.`);
+      aiReport = data.response || "No report generated.";
+    } catch (err: any) {
+      aiReport = `### Error generating report\n\n${err.message}`;
     }
 
     // Fallback to static report if AI didn't return useful content

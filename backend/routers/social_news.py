@@ -1,12 +1,15 @@
 from fastapi import APIRouter, Depends, HTTPException, Form, UploadFile, File
 from sqlalchemy.orm import Session
 from database import get_db
-from security import get_current_user
+from security import get_current_user, require_api_credits
 from api_hub import api_hub
 from tools import WebScraperTool
 import base64
 import os
 import tempfile
+import requests
+from fastapi.responses import StreamingResponse
+
 
 router = APIRouter(
     prefix="/social-news",
@@ -17,6 +20,7 @@ router = APIRouter(
 async def generate_post(
     url: str = Form(...),
     language: str = Form(default="en"),
+    current_user: dict = Depends(require_api_credits(cost=2))
 ):
     """
     Step 2 & 3: Analyzes the source link and generates a highly engaging Facebook post.
@@ -59,7 +63,7 @@ FACEBOOK POST REQUIREMENTS:
 * Easy-to-read, short paragraphs
 * Emotionally engaging and factually accurate
 * Strategic use of emojis
-* Relevant hashtags at the bottom
+* DO NOT include any hashtags in the post.
 
 Output format MUST exactly follow:
 [Facebook Post]
@@ -71,7 +75,7 @@ Output format MUST exactly follow:
     ]
     
     try:
-        result = await api_hub.chat(messages)
+        result = await api_hub.chat(messages, max_tokens=1500)
         return {
             "post": result["content"].replace("[Facebook Post]", "").strip(),
             "image": scrape_res.get("image_url", ""),
@@ -143,10 +147,24 @@ Determine why this image attracts attention and provide strategic advice on how 
     ]
     
     try:
-        result = await api_hub.chat(messages)
+        result = await api_hub.chat(messages, max_tokens=1500)
         return {
             "analysis": result["content"],
             "status": "success"
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+from fastapi.responses import JSONResponse
+import base64
+
+@router.get("/proxy-image")
+async def proxy_image(url: str):
+    try:
+        headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
+        r = requests.get(url, headers=headers, stream=False, timeout=10)
+        img_base64 = base64.b64encode(r.content).decode('utf-8')
+        mime_type = r.headers.get('content-type', 'image/jpeg')
+        return JSONResponse({"base64": f"data:{mime_type};base64,{img_base64}"})
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))

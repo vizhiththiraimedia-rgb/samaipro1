@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
+import html2canvas from "html2canvas";
 import Link from "next/link";
-import { apiFetch } from "../../../utils/api";
+import { apiFetch, getApiBaseUrl } from "../../../utils/api";
 import { 
-  Flame, Globe, Newspaper, Share2, Copy, Check, 
+  Flame, Download, Globe, Newspaper, Share2, Copy, Check, 
   ArrowLeft, Sparkles, RefreshCw, Upload, Eye, 
   ExternalLink, Layers, Shield, Send, CheckCircle2
 } from "lucide-react";
@@ -23,6 +24,21 @@ export default function SocialNewsPage() {
   const [postResult, setPostResult] = useState("");
   const [featureImage, setFeatureImage] = useState("");
   const [copied, setCopied] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  const handleDownloadImage = async () => {
+    if (!cardRef.current) return;
+    try {
+      const canvas = await html2canvas(cardRef.current, { backgroundColor: "#05060a", scale: 2, useCORS: true, allowTaint: true });
+      const dataUrl = canvas.toDataURL("image/jpeg", 0.9);
+      const link = document.createElement("a");
+      link.href = dataUrl;
+      link.download = `samai-news-${Date.now()}.jpg`;
+      link.click();
+    } catch (e) {
+      console.error("Download failed", e);
+    }
+  };
 
   const handleGenerateNews = async (customUrl?: string) => {
     const targetUrl = customUrl || url;
@@ -43,9 +59,18 @@ export default function SocialNewsPage() {
       });
 
       if (data && data.post) {
-        setPostResult(data.post);
-        setFeatureImage(data.image || "");
-      }
+          setPostResult(data.post.replace(/#\S+/g, "").trim());
+          if (data.image) {
+            try {
+              const b64Res = await apiFetch(`/social-news/proxy-image?url=${encodeURIComponent(data.image)}`);
+              setFeatureImage(b64Res.base64 || data.image);
+            } catch (e) {
+              setFeatureImage(data.image);
+            }
+          } else {
+            setFeatureImage("");
+          }
+        }
     } catch {
       // High-quality local news synthesis fallback
       if (newsLanguage === "si") {
@@ -186,37 +211,60 @@ export default function SocialNewsPage() {
                 <Newspaper size={16} color="#ef4444" /> Formatted Social News Card
               </span>
               {postResult && (
-                <button
-                  onClick={handleCopy}
-                  style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "#fff", padding: "5px 12px", borderRadius: "6px", fontSize: "0.78rem", cursor: "pointer", display: "flex", alignItems: "center", gap: "4px" }}
-                >
-                  {copied ? <Check size={13} color="#22c55e" /> : <Copy size={13} />}
-                  {copied ? "Copied" : "Copy News"}
-                </button>
+                <div style={{ display: "flex", gap: "8px" }}>
+                  <button
+                    onClick={handleDownloadImage}
+                    style={{ background: "rgba(239, 68, 68, 0.1)", border: "1px solid rgba(239, 68, 68, 0.3)", color: "#ef4444", padding: "5px 12px", borderRadius: "6px", fontSize: "0.78rem", cursor: "pointer", display: "flex", alignItems: "center", gap: "4px", fontWeight: 600 }}
+                  >
+                    <Download size={13} /> Download Post
+                  </button>
+                  <button
+                    onClick={handleCopy}
+                    style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "#fff", padding: "5px 12px", borderRadius: "6px", fontSize: "0.78rem", cursor: "pointer", display: "flex", alignItems: "center", gap: "4px" }}
+                  >
+                    {copied ? <Check size={13} color="#22c55e" /> : <Copy size={13} />}
+                    {copied ? "Copied" : "Copy News"}
+                  </button>
+                </div>
               )}
             </div>
 
-            <div style={{ flex: 1, minHeight: "300px", background: "#05060a", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "12px", overflow: "hidden", display: "flex", flexDirection: "column" }}>
-              {loading ? (
-                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100%", padding: "3rem", gap: "10px" }}>
-                  <RefreshCw className="animate-spin" size={28} color="#ef4444" />
-                  <span style={{ color: "#9ca3af", fontSize: "0.85rem" }}>Extracting source metadata and synthesizing post...</span>
-                </div>
-              ) : postResult ? (
-                <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
-                  {featureImage && (
-                    <div style={{ width: "100%", height: "200px", backgroundImage: `url(${featureImage})`, backgroundSize: "cover", backgroundPosition: "center", borderBottom: "1px solid rgba(255,255,255,0.05)" }}></div>
+            <div style={{ width: '100%', overflow: 'auto', display: 'flex', justifyContent: 'center', background: '#11131a', padding: '1rem', borderRadius: '12px' }}>
+                <div ref={cardRef} style={{ width: "700px", minHeight: "1024px", background: "#fdb953", position: "relative", display: "flex", flexDirection: "column", fontFamily: "sans-serif" }}>
+                  
+                  {loading ? (
+                    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "1024px", gap: "10px" }}>
+                      <RefreshCw className="animate-spin" size={36} color="#232185" />
+                      <span style={{ color: "#232185", fontSize: "1.1rem", fontWeight: "bold" }}>Generating Post...</span>
+                    </div>
+                  ) : postResult ? (
+                    <>
+                      {/* Top Image Section */}
+                      {featureImage ? (
+                        <img src={featureImage} style={{ width: "100%", height: "460px", objectFit: "cover", display: "block" }} />
+                      ) : (
+                        <div style={{ width: "100%", height: "460px", background: "#fdb953" }}></div>
+                      )}
+
+                      {/* Logo Top Right */}
+                      <img src="/assets/chudar_logo.png" style={{ position: "absolute", top: "20px", right: "20px", width: "100px", height: "100px", borderRadius: "8px", objectFit: "contain", background: "#fff" }} />
+
+                      {/* Text Box */}
+                      <div style={{ margin: "20px", flex: 1, backgroundColor: "#fff", border: "2px solid #232185", borderRadius: "15px", padding: "30px", marginBottom: "150px" }}>
+                        <div style={{ color: "#ed1c24", fontSize: "1.2rem", lineHeight: 1.8, whiteSpace: "pre-wrap", fontWeight: 600 }}>
+                          {postResult}
+                        </div>
+                      </div>
+
+                      {/* Bottom Banner */}
+                      <img src="/assets/sasip_banner.png" style={{ position: "absolute", bottom: "0", left: "0", width: "100%", height: "130px", objectFit: "cover" }} />
+                    </>
+                  ) : (
+                    <div style={{ padding: "3rem", color: "#232185", fontSize: "1.1rem", textAlign: "center", fontWeight: "bold", marginTop: "200px" }}>
+                      Enter a news URL to generate the card...
+                    </div>
                   )}
-                  <div style={{ padding: "1.5rem", color: "#e5e7eb", fontSize: "0.95rem", lineHeight: 1.7, whiteSpace: "pre-wrap", overflowY: "auto", flex: 1 }}>
-                    {postResult}
-                  </div>
-                </div>
-              ) : (
-                <div style={{ padding: "1.5rem", color: "#4b5563", fontSize: "0.92rem" }}>
-                  Enter a news URL and click 'Generate Social News Post' to produce multi-lingual broadcast copy...
-                </div>
-              )}
-            </div>
+                </div></div>
           </div>
 
         </div>

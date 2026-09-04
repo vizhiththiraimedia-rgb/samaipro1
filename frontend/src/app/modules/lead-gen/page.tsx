@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import WhatsAppAutomation from "@/components/WhatsAppAutomation";
+import { getApiBaseUrl } from "@/utils/api";
 
 // Using native fetch for Vercel compatibility
 
@@ -73,7 +74,7 @@ export default function LeadGenPage() {
         formData.append("lead_id", selectedLead.id);
       }
 
-      const res = await fetch("/api/lead-gen/refactor-web-code", {
+      const res = await fetch(`${getApiBaseUrl()}/api/lead-gen/refactor-web-code`, {
         method: "POST",
         body: formData,
       });
@@ -127,7 +128,7 @@ export default function LeadGenPage() {
         formDataProp.append("sender_name", senderName);
         formDataProp.append("sender_phone", senderPhone);
 
-        const resProp = await fetch("/api/lead-gen/generate-proposal", {
+        const resProp = await fetch(`${getApiBaseUrl()}/api/lead-gen/generate-proposal`, {
           method: "POST",
           body: formDataProp,
         });
@@ -145,7 +146,7 @@ export default function LeadGenPage() {
       formData.append("demo_url", demoUrl || "");
       formData.append("whatsapp_url", waUrl || "");
 
-      const res = await fetch("/api/lead-gen/send-telegram-proposal", {
+      const res = await fetch(`${getApiBaseUrl()}/api/lead-gen/send-telegram-proposal`, {
         method: "POST",
         body: formData,
       });
@@ -182,7 +183,7 @@ export default function LeadGenPage() {
       formData.append("color_theme", primaryColor === "#ec4899" ? "pink" : primaryColor === "#3b82f6" ? "blue" : primaryColor === "#10b981" ? "emerald" : primaryColor === "#8b5cf6" ? "purple" : "amber");
       formData.append("tagline", customTagline || "");
 
-      const res = await fetch("/api/lead-gen/generate-web-code", {
+      const res = await fetch(`${getApiBaseUrl()}/api/lead-gen/generate-web-code`, {
         method: "POST",
         body: formData,
       });
@@ -224,7 +225,7 @@ export default function LeadGenPage() {
   const fetchLeads = async () => {
     setLoadingLeads(true);
     try {
-      const res = await fetch("/api/lead-gen/leads");
+      const res = await fetch(`${getApiBaseUrl()}/api/lead-gen/leads`);
       if (!res.ok) {
         console.warn("Backend leads response not OK:", res.status);
         setLeads([]);
@@ -255,7 +256,7 @@ export default function LeadGenPage() {
 
     setLoadingSearch(true);
     try {
-      const res = await fetch("/api/lead-gen/search", {
+      const res = await fetch(`${getApiBaseUrl()}/api/lead-gen/search`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -283,7 +284,7 @@ export default function LeadGenPage() {
     setSelectedLead(lead);
     setGeneratingDemo(true);
     try {
-      const res = await fetch("/api/lead-gen/generate-demo", {
+      const res = await fetch(`${getApiBaseUrl()}/api/lead-gen/generate-demo`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -312,7 +313,7 @@ export default function LeadGenPage() {
     setSelectedLead(lead);
     setGeneratingProposal(true);
     try {
-      const res = await fetch("/api/lead-gen/generate-proposal", {
+      const res = await fetch(`${getApiBaseUrl()}/api/lead-gen/generate-proposal`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -341,7 +342,7 @@ export default function LeadGenPage() {
   const handleClearAllLeads = async () => {
     if (!confirm("Are you sure you want to clear all old saved leads?")) return;
     try {
-      await fetch("/api/lead-gen/leads-clear/all", { method: "DELETE" });
+      await fetch(`${getApiBaseUrl()}/api/lead-gen/leads-clear/all`, { method: "DELETE" });
       showNotification("All old saved leads cleared!", "success");
       setLeads([]);
       setSelectedLead(null);

@@ -32,6 +32,21 @@ export default function LearningPage() {
     activeWeights: "SAM-v2-RLHF"
   });
 
+  const [knowledgeList, setKnowledgeList] = useState<any[]>([]);
+  useEffect(() => {
+    fetchKnowledge();
+  }, []);
+  const fetchKnowledge = async () => {
+    try {
+      const res = await apiFetch("/learning/knowledge");
+      if (res && res.knowledge) {
+        setKnowledgeList(res.knowledge);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   const handleIngestKnowledge = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!knowledgeContent.trim()) return;
@@ -51,8 +66,9 @@ export default function LearningPage() {
       });
       setIngestSuccess(true);
       setMemoryStats(prev => ({ ...prev, vectorsStored: prev.vectorsStored + 1 }));
+      fetchKnowledge();
     } catch {
-      setIngestSuccess(true); // Local brain memory updated
+      alert("Failed to ingest knowledge. Ensure backend is running.");
     } finally {
       setIngesting(false);
     }
@@ -137,21 +153,17 @@ export default function LearningPage() {
               </h3>
 
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
-                {[
-                  { domain: "Sinhala & Tamil NLP", size: "4,120 Vectors", status: "Active Learning", color: "#8b5cf6" },
-                  { domain: "FastAPI & Next.js Architecture", size: "3,840 Vectors", status: "Continuously Indexed", color: "#3b82f6" },
-                  { domain: "Vedic Astrology Rulesets", size: "2,950 Vectors", status: "High Confidence", color: "#ec4899" },
-                  { domain: "Flutter & Mobile Reverse Eng", size: "2,410 Vectors", status: "Zero-Shot Ready", color: "#10b981" },
-                  { domain: "Healthcare & Diagnostics (LabNova)", size: "1,500 Vectors", status: "Verified Reference", color: "#06b6d4" },
-                ].map((v, i) => (
+                {knowledgeList.length > 0 ? knowledgeList.map((kb, i) => (
                   <div key={i} style={{ background: "rgba(0,0,0,0.3)", border: "1px solid rgba(255,255,255,0.05)", borderRadius: "12px", padding: "1rem" }}>
-                    <div style={{ fontSize: "0.9rem", fontWeight: 700, color: "#fff", marginBottom: "4px" }}>{v.domain}</div>
-                    <div style={{ fontSize: "0.75rem", color: "#9ca3af", marginBottom: "6px" }}>{v.size}</div>
-                    <span style={{ fontSize: "0.7rem", padding: "2px 8px", borderRadius: "6px", background: `${v.color}20`, color: v.color, fontWeight: 600 }}>
-                      ● {v.status}
+                    <div style={{ fontSize: "0.9rem", fontWeight: 700, color: "#fff", marginBottom: "4px" }}>{kb.source}</div>
+                    <div style={{ fontSize: "0.75rem", color: "#9ca3af", marginBottom: "6px" }}>{kb.usage_count || 0} Usages</div>
+                    <span style={{ fontSize: "0.7rem", padding: "2px 8px", borderRadius: "6px", background: `rgba(139, 92, 246, 0.2)`, color: "#8b5cf6", fontWeight: 600 }}>
+                      ● {kb.metadata?.category || "General"}
                     </span>
                   </div>
-                ))}
+                )) : (
+                  <div style={{ color: "#9ca3af", fontSize: "0.85rem", gridColumn: "1 / -1" }}>No custom knowledge ingested yet. Switch to the Knowledge Ingestion tab to add some!</div>
+                )}
               </div>
             </div>
 

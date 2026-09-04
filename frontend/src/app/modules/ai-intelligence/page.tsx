@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { apiFetch } from "../../../utils/api";
+import { apiFetch, getApiBaseUrl } from "../../../utils/api";
 import { 
   Radio, Shield, Activity, RefreshCw, Send, CheckCircle2, 
   AlertTriangle, Server, Cpu, Database, ArrowLeft, Zap,
@@ -60,10 +60,25 @@ const INITIAL_WATCHERS: Watcher[] = [
 ];
 
 export default function AiIntelligencePage() {
-  const [watchers, setWatchers] = useState<Watcher[]>(INITIAL_WATCHERS);
+    const [watchers, setWatchers] = useState<Watcher[]>([]);
   const [activeTab, setActiveTab] = useState<"watchers" | "briefing" | "telemetry">("watchers");
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [generatingBriefing, setGeneratingBriefing] = useState(false);
+
+  useEffect(() => {
+    fetchWatchers();
+  }, []);
+
+  const fetchWatchers = async () => {
+    try {
+      const res = await apiFetch("/api/ai-intelligence/watchers");
+      if (res && Array.isArray(res)) {
+        setWatchers(res);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   // New Watcher Form State
   const [newWatcherName, setNewWatcherName] = useState("");
@@ -93,51 +108,62 @@ export default function AiIntelligencePage() {
    - புதிய A/L இயற்பியல் வினாத்தாள் மொழிபெயர்ப்பு திட்டத்தை சரிபார்த்து வாடிக்கையாளருக்கு அனுப்பி வைக்கவும்.`
   );
 
-  const handleAddWatcher = (e: React.FormEvent) => {
+    const handleAddWatcher = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newWatcherName || !newWatcherCriteria) return;
 
-    const newObj: Watcher = {
-      id: `WAT-0${watchers.length + 1}`,
-      name: newWatcherName,
-      category: newWatcherCategory,
-      criteria: newWatcherCriteria,
-      schedule: newWatcherSchedule,
-      channel: newWatcherChannel,
-      status: "Active"
-    };
-
-    setWatchers([newObj, ...watchers]);
-    setNewWatcherName("");
-    setNewWatcherCriteria("");
+    try {
+      await apiFetch("/api/ai-intelligence/watchers", {
+        method: "POST",
+        body: JSON.stringify({
+          name: newWatcherName,
+          category: newWatcherCategory,
+          criteria: newWatcherCriteria,
+          schedule: newWatcherSchedule,
+          channel: newWatcherChannel
+        })
+      });
+      setNewWatcherName("");
+      setNewWatcherCriteria("");
+      fetchWatchers();
+    } catch (e) {
+      console.error(e);
+    }
   };
 
-  const handleToggleStatus = (id: string) => {
-    setWatchers(prev => prev.map(w => {
-      if (w.id === id) {
-        return { ...w, status: w.status === "Active" ? "Paused" : "Active" };
-      }
-      return w;
-    }));
+    const handleToggleStatus = async (id: string) => {
+    try {
+      await apiFetch(`/api/ai-intelligence/watchers/${id}/status`, { method: "PUT" });
+      fetchWatchers();
+    } catch (e) {
+      console.error(e);
+    }
   };
 
-  const handleDeleteWatcher = (id: string) => {
-    setWatchers(prev => prev.filter(w => w.id !== id));
+  const handleDeleteWatcher = async (id: string) => {
+    try {
+      await apiFetch(`/api/ai-intelligence/watchers/${id}`, { method: "DELETE" });
+      fetchWatchers();
+    } catch (e) {
+      console.error(e);
+    }
   };
 
-  const handleGenerateLiveBriefing = () => {
+
+    const handleGenerateLiveBriefing = async () => {
     setGeneratingBriefing(true);
-    setTimeout(() => {
-      setBriefingText(
-        `வணக்கம் மச்சான்! ${new Date().toLocaleDateString('ta-LK')} நாளுக்கான புதுப்பிக்கப்பட்ட நேரலை அறிக்கை:\n\n` +
-        `1. 💼 Agency Bidding Hub: 4 செயலில் உள்ள திட்டங்கள். ஊழியர் வருமானம் $270 | நிறுவன லாபம் $440 USD.\n` +
-        `2. 📄 PDF & Localization Engine: Physics past paper மொழிபெயர்ப்பு 100% துல்லியமாக நிறைவுற்றது.\n` +
-        `3. 🔑 Multi-API Rotator: Gemini & Groq எவ்வித தாமதமுமின்றி (42ms latency) இயங்குகின்றன.\n` +
-        `4. 🔮 Astrology Studio: Traditional Kendare அல்காரிதம் 500% திருப்தியுடன் இயங்குகிறது.`
-      );
-      setGeneratingBriefing(false);
+    try {
+      const res = await fetch(`${getApiBaseUrl()}/ai-intelligence/generate-briefing`, { method: "POST" }).then(r => r.json());
+      if (res && res.briefing) {
+        setBriefingText(res.briefing);
+      }
       setActiveTab("briefing");
-    }, 600);
+    } catch (e) {
+      console.error(e);
+      setBriefingText("மன்னிக்கவும், சர்வருடன் தொடர்பு கொள்ள முடியவில்லை (Connection Error).");
+    } finally {
+      setGeneratingBriefing(false);
+    }
   };
 
   const speakBriefing = (text: string) => {

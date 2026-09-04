@@ -220,6 +220,18 @@ export default function AgencyWorkspace() {
   const [jobs, setJobs] = useState<Job[]>(INITIAL_JOBS);
   const [team, setTeam] = useState<TeamMember[]>(INITIAL_TEAM);
   const [selectedManual, setSelectedManual] = useState<any>(MODULE_USER_MANUALS[0]);
+
+  React.useEffect(() => {
+    import("../../../utils/api").then(({ apiFetch }) => {
+      apiFetch("/api/agency-workspace/jobs")
+        .then(res => {
+          if (res.jobs && res.jobs.length > 0) {
+            setJobs([...res.jobs, ...INITIAL_JOBS]);
+          }
+        })
+        .catch(console.error);
+    });
+  }, []);
   
   // Proxy Chat Simulator State
   const [clientMsg, setClientMsg] = useState("Hi, I need a complete 2025 Physics Past Paper translated from English to Tamil and Sinhala by tonight. How much will it cost?");
@@ -401,12 +413,35 @@ export default function AgencyWorkspace() {
                       )}
 
                       {job.status === 'claimed' && (
+                        <>
+                        <button
+                          onClick={async () => {
+                            if (!job.id.startsWith("AGENT-TASK")) {
+                               alert("Auto-execute is only supported for Agent Plans right now."); return;
+                            }
+                             try {
+                               const { apiFetch } = await import("../../../utils/api");
+                               await apiFetch("/agency-workspace/execute-job", {
+                                 method: "POST",
+                                 body: JSON.stringify({job_id: job.id})
+                               });
+                               alert("Pipeline finished! Assets saved.");
+                               handleCompleteJob(job.id);
+                             } catch (e) {
+                               console.error(e);
+                             }
+                          }}
+                          style={{ background: "linear-gradient(135deg, #c084fc, #8b5cf6)", color: "#fff", border: "none", padding: "6px 16px", borderRadius: "8px", fontSize: "0.85rem", fontWeight: 700, cursor: "pointer", marginRight: "8px" }}
+                        >
+                          Auto-Execute AI Pipeline 🤖
+                        </button>
                         <button
                           onClick={() => handleCompleteJob(job.id)}
                           style={{ background: "linear-gradient(135deg, #3b82f6, #2563eb)", color: "#fff", border: "none", padding: "6px 16px", borderRadius: "8px", fontSize: "0.85rem", fontWeight: 700, cursor: "pointer" }}
                         >
-                          Submit Solution ✓
+                          Manual Submit ✓
                         </button>
+                        </>
                       )}
 
                       {job.status === 'completed' && (

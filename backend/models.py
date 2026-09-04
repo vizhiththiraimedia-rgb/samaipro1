@@ -1,4 +1,4 @@
-import uuid
+﻿import uuid
 from sqlalchemy import Column, String, Text, DateTime, ForeignKey, Integer, Float, Boolean
 from sqlalchemy.orm import relationship
 from datetime import datetime
@@ -65,6 +65,10 @@ class AccessKey(Base):
 
     # Map a key to a specific pseudo-user so they retain chat history
     user_id = Column(String(36), ForeignKey("users.id"), nullable=True)
+    
+    # API Provider Billing
+    api_credit_balance = Column(Integer, default=0)
+    service_tier = Column(String(50), default="free") # free, basic, pro, enterprise
 
 class APIProvider(Base):
     __tablename__ = "api_providers"
@@ -643,3 +647,79 @@ class CommAISummary(Base):
     summary_metadata = Column(Text)
     created_at = Column(DateTime, default=datetime.utcnow)
 
+
+class Watcher(Base):
+    __tablename__ = 'watchers'
+
+    id = Column(String(36), primary_key=True, default=generate_uuid)
+    user_id = Column(String(36), ForeignKey('users.id'), nullable=True)
+    name = Column(String(255), nullable=False)
+    category = Column(String(100), nullable=False)
+    criteria = Column(Text, nullable=False)
+    schedule = Column(String(100), nullable=False)
+    channel = Column(String(100), nullable=False)
+    status = Column(String(50), default='Active')
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+
+class AgentRoster(Base):
+    __tablename__ = 'agent_roster'
+
+    id = Column(String(36), primary_key=True, default=generate_uuid)
+    name = Column(String(255), nullable=False)
+    category = Column(String(100), nullable=False)
+    description = Column(Text, nullable=True)
+    color = Column(String(50), nullable=True)
+    emoji = Column(String(50), nullable=True)
+    vibe = Column(Text, nullable=True)
+    system_prompt = Column(Text, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+class ApiUsageLog(Base):
+    __tablename__ = "api_usage_logs"
+
+    id = Column(String(36), primary_key=True, default=generate_uuid)
+    key_id = Column(String(36), ForeignKey("access_keys.id"))
+    endpoint = Column(String(100), nullable=False) # e.g. /v1/voice/tts
+    cost = Column(Integer, default=0)
+    status_code = Column(Integer, default=200)
+    client_ip = Column(String(50), nullable=True)
+    timestamp = Column(DateTime, default=datetime.utcnow)
+
+
+
+class ServiceAPIKey(Base):
+    __tablename__ = 'service_api_keys'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    service_name = Column(String(100), nullable=False)
+    api_key_hash = Column(String(255), nullable=False)
+    credits_granted = Column(Integer, default=0)
+    status = Column(String(20), default='active') # active, revoked
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+class UserCredit(Base):
+    __tablename__ = 'user_credits'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(String(36), ForeignKey('users.id'), nullable=False)
+    service_name = Column(String(100), nullable=False)
+    balance = Column(Integer, default=0)
+    total_purchased = Column(Integer, default=0)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    user = relationship('User', backref='credits')
+
+class CreditTransaction(Base):
+    __tablename__ = 'credit_transactions'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(String(36), ForeignKey('users.id'), nullable=False)
+    service_name = Column(String(100), nullable=False)
+    amount = Column(Integer, nullable=False) # positive = purchase, negative = deduction
+    endpoint = Column(String(255), nullable=True)
+    request_id = Column(String(255), nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    user = relationship('User', backref='transactions')

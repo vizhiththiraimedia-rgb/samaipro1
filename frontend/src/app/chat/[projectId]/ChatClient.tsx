@@ -36,7 +36,7 @@ export default function ChatClient({ projectId }: { projectId: string }) {
   const fetchHistory = useCallback(async () => {
     try {
       const data = await apiFetch(`/chat/${projectId}`);
-      setMessages(data);
+      if (Array.isArray(data)) { setMessages(data); } else if (data.content) { setMessages([{ role: "assistant", content: data.content }]); }
     } catch (err) {
       console.error("Failed to fetch chat history", err);
     }
@@ -79,20 +79,10 @@ export default function ChatClient({ projectId }: { projectId: string }) {
         }
       });
 
-      const token = localStorage.getItem("token");
-      const response = await fetch(`/api/chat/${projectId}`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to send message");
-      }
-
-      const data = await response.json();
+      const data = await apiFetch(`/chat/${projectId}`, {
+          method: "POST",
+          body: formData,
+        });
       const aiMessage: Message = { role: "assistant", content: data.content };
       setMessages((prev) => [...prev, aiMessage]);
     } catch (err) {

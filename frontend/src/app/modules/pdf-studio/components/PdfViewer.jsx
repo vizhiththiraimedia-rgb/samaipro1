@@ -66,39 +66,47 @@ const PdfViewer = ({ file, onPageRendered, activeTool, annotations, setAnnotatio
     fileReader.readAsArrayBuffer(file);
   }, [file]);
 
+  const renderTaskRef = useRef(null);
+
   // Render page when pageNum or pdfDoc changes
   useEffect(() => {
     if (!pdfDoc) return;
+    
+    // Instead of queueing, let's just cancel the previous render if it exists
+    const renderPage = async (num) => {
+      try {
+        if (renderTaskRef.current) {
+          renderTaskRef.current.cancel();
+        }
+        
+        const page = await pdfDoc.getPage(num);
+        const viewport = page.getViewport({ scale });
+        const canvas = canvasRef.current;
+        const ctx = canvas.getContext('2d');
+        
+        canvas.height = viewport.height;
+        canvas.width = viewport.width;
+        setDimensions({ width: viewport.width, height: viewport.height });
+
+        const renderContext = {
+          canvasContext: ctx,
+          viewport: viewport
+        };
+
+        const renderTask = page.render(renderContext);
+        renderTaskRef.current = renderTask;
+        
+        await renderTask.promise;
+        renderTaskRef.current = null;
+      } catch (err) {
+        if (err.name !== 'RenderingCancelledException') {
+          console.error("PDF Render Error:", err);
+        }
+      }
+    };
+
     renderPage(pageNum);
   }, [pdfDoc, pageNum, scale]);
-
-  const renderPage = (num) => {
-    setPageRendering(true);
-    pdfDoc.getPage(num).then((page) => {
-      const viewport = page.getViewport({ scale });
-      const canvas = canvasRef.current;
-      const ctx = canvas.getContext('2d');
-      
-      canvas.height = viewport.height;
-      canvas.width = viewport.width;
-      setDimensions({ width: viewport.width, height: viewport.height });
-
-      const renderContext = {
-        canvasContext: ctx,
-        viewport: viewport
-      };
-
-      const renderTask = page.render(renderContext);
-      
-      renderTask.promise.then(() => {
-        setPageRendering(false);
-        if (pageNumPending !== null) {
-          renderPage(pageNumPending);
-          setPageNumPending(null);
-        }
-      });
-    });
-  };
 
   const onPrevPage = () => {
     if (pageNum <= 1) return;

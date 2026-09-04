@@ -86,17 +86,22 @@ export default function AgentsPage() {
 
   const loadAgents = async () => {
     try {
-      const data = await apiFetch("/agents/available");
-      if (data && data.agents && Array.isArray(data.agents) && data.agents.length > 0) {
-        // Keep merged rich list
-        const updated = DEFAULT_AGENTS.map(def => {
-          const match = data.agents.find((a: string) => a.toLowerCase().includes(def.name.toLowerCase().split(' ')[0]));
-          return match ? { ...def, isLive: true } : def;
-        });
-        setAgents(updated);
+      const data = await apiFetch("/api/ai-intelligence/agents?limit=500");
+      if (data && Array.isArray(data) && data.length > 0) {
+        const realAgents = data.map((a: any) => ({
+          name: a.name,
+          color: a.color || "#8b5cf6",
+          description: a.description || a.vibe || "Specialized AI Agent",
+          tools: [a.category],
+          emoji: a.emoji,
+          category: a.category
+        }));
+        // Show all agents in the dropdown and grid
+        setAgents(realAgents);
+      } else {
+        setAgents(DEFAULT_AGENTS);
       }
     } catch {
-      // Use rich default agents fallback
       setAgents(DEFAULT_AGENTS);
     }
   };
@@ -130,8 +135,14 @@ export default function AgentsPage() {
       formData.append("task", task);
       formData.append("context", context);
       formData.append("use_planning", String(usePlanning));
+      
+      const formElement = e.target as HTMLFormElement;
+      const agentSelect = formElement.elements.namedItem('agent_name') as HTMLSelectElement;
+      if (agentSelect && agentSelect.value) {
+        formData.append("agent_name", agentSelect.value);
+      }
 
-      const data = await apiFetch("/agents/run", {
+      const data = await apiFetch("/api/agents/run", {
         method: "POST",
         body: formData,
       });
@@ -242,6 +253,19 @@ export default function AgentsPage() {
               </label>
             </div>
 
+            <div>
+              <label style={{ fontSize: "0.85rem", color: "#9ca3af", display: "block", marginBottom: "0.4rem" }}>Select Agent (Optional)</label>
+              <select
+                name="agent_name"
+                style={{ width: "100%", background: "#0a0c16", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", padding: "0.7rem", color: "#fff", fontSize: "0.85rem", outline: "none", boxSizing: "border-box" }}
+              >
+                <option value="">Auto-Route (Planner Agent)</option>
+                {agents.map((a, idx) => (
+                  <option key={idx} value={a.name}>{a.emoji || "🤖"} {a.name} - {a.category}</option>
+                ))}
+              </select>
+            </div>
+
             <button 
               type="submit" 
               disabled={loading || !task.trim()}
@@ -264,6 +288,25 @@ export default function AgentsPage() {
                   <span style={{ color: "#9ca3af", fontSize: "0.8rem", display: "flex", alignItems: "center", gap: "4px" }}>
                     <Clock size={13} /> {result.execution_time ? `${result.execution_time.toFixed(2)}s` : "< 1.5s"}
                   </span>
+                  
+                  <button
+                    onClick={async () => {
+                      try {
+                        const fd = new FormData();
+                        fd.append("title", task.substring(0, 50) + "...");
+                        fd.append("content", result.result);
+                        fd.append("agent_name", result.agent_used);
+                        await apiFetch("/api/agents/save-plan", { method: "POST", body: fd });
+                        alert("Successfully saved to Project Memory!");
+                      } catch (err) {
+                        alert("Failed to save plan.");
+                      }
+                    }}
+                    style={{ background: "rgba(139,92,246,0.15)", border: "1px solid rgba(139,92,246,0.4)", color: "#c084fc", padding: "4px 10px", borderRadius: "6px", fontSize: "0.78rem", cursor: "pointer", display: "flex", alignItems: "center", gap: "4px" }}
+                  >
+                    <Layers size={13} /> Save Plan
+                  </button>
+
                   <button
                     onClick={handleCopyResult}
                     style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.15)", color: "#fff", padding: "4px 10px", borderRadius: "6px", fontSize: "0.78rem", cursor: "pointer", display: "flex", alignItems: "center", gap: "4px" }}
@@ -303,10 +346,10 @@ export default function AgentsPage() {
           </h3>
 
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "1.2rem" }}>
-            {agents.map((agent) => {
+            {agents.map((agent, idx) => {
               const Icon = agent.icon || Bot;
               return (
-                <div key={agent.name} style={{
+                <div key={`${agent.name}-${idx}`} style={{
                   padding: "1.4rem",
                   background: "rgba(25, 25, 38, 0.5)",
                   borderRadius: "16px",
@@ -318,7 +361,11 @@ export default function AgentsPage() {
                   <div>
                     <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "0.8rem" }}>
                       <div style={{ width: "36px", height: "36px", borderRadius: "10px", background: `rgba(255,255,255,0.06)`, border: `1px solid ${agent.color}40`, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                        <Icon size={18} color={agent.color} />
+                        {agent.emoji ? (
+                          <span style={{ fontSize: "18px" }}>{agent.emoji}</span>
+                        ) : (
+                          <Icon size={18} color={agent.color} />
+                        )}
                       </div>
                       <div>
                         <h4 style={{ margin: 0, fontSize: "1rem", fontWeight: 700 }}>{agent.name}</h4>

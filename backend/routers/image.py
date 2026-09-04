@@ -364,3 +364,72 @@ async def generate_image(
             "message": str(e)
         }
 
+@router.post("/generate")
+async def generate_image_route(
+    prompt: str = Form(...),
+    width: int = Form(default=512),
+    height: int = Form(default=512),
+    model: str = Form(default="stable-diffusion-xl"),
+    negative_prompt: str = Form(default="")
+):
+    # Retrieve HF Token
+    hf_token = os.getenv("HUGGINGFACE_API_KEY", "")
+    
+    if not hf_token or hf_token == "YOUR_HF_TOKEN_HERE":
+        # Fallback to a free placeholder image if key is not configured yet
+        return {
+            "status": "pending_key",
+            "message": "Hugging Face API key not found. Showing placeholder. Please add HUGGINGFACE_API_KEY to your .env file.",
+            "image_url": "https://placehold.co/512x512/000000/FFFFFF/png?text=Waiting+for+HF+Key"
+        }
+    
+    # Hit Hugging Face Inference API (Stable Diffusion 3 Medium or SDXL)
+    API_URL = "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0"
+    headers = {"Authorization": f"Bearer {hf_token}"}
+    payload = {
+        "inputs": prompt,
+        "parameters": {
+            "negative_prompt": negative_prompt
+        }
+    }
+    
+    try:
+        import requests
+        response = requests.post(API_URL, headers=headers, json=payload)
+        if response.status_code == 200:
+            import base64
+            image_bytes = response.content
+            base64_img = base64.b64encode(image_bytes).decode('utf-8')
+            return {
+                "status": "success",
+                "image_url": f"data:image/jpeg;base64,{base64_img}"
+            }
+        else:
+            raise HTTPException(status_code=response.status_code, detail=f"Hugging Face Error: {response.text}")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+@router.post("/generate-prompt")
+async def generate_advanced_prompt(
+    prompt: str = Form(..., alias="topic", default=None) if False else Form(None),
+    style: str = Form("photorealistic"),
+    request: Request = None,
+):
+    try:
+        form_data = await request.form()
+        raw_prompt = form_data.get("prompt") or form_data.get("topic") or "A beautiful landscape"
+    except:
+        raw_prompt = prompt or "A beautiful landscape"
+        
+    instructions = f"Enhance this basic image idea into a highly detailed, professional prompt for an AI image generator (like Midjourney). Idea: {raw_prompt}. Style: {style}. Only return the prompt text, no intro or outro."
+    
+    messages = [
+        {"role": "system", "content": "You are an expert AI image prompt engineer. Return ONLY the enhanced prompt string."},
+        {"role": "user", "content": instructions}
+    ]
+    
+    try:
+        from api_hub import api_hub
+        result = await api_hub.chat(messages, max_tokens=500)
+        return {"prompt": result["content"].strip()}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

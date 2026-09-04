@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from fastapi import APIRouter, Depends, HTTPException, status, Request
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy.orm import Session
 
 from database import get_db
@@ -47,7 +47,7 @@ class UserLogin(BaseModel):
 login_attempts = {}
 
 @router.post("/login")
-def login_user(user_credentials: UserLogin, db: Session = Depends(get_db)):
+def login_user(user_credentials: UserLogin, request: Request, db: Session = Depends(get_db)):
     email = user_credentials.email
     now = datetime.utcnow()
     
@@ -121,13 +121,6 @@ async def key_login(
     req: KeyLoginRequest,
     db: Session = Depends(get_db),
 ):
-    if req.key_code == "SAM-MASTER-ADMIN":
-        admin = db.query(models.User).filter(models.User.email == "sam@mail.com").first()
-        if admin:
-            access_token = security.create_access_token(data={"user_id": str(admin.id), "role": admin.role})
-            return {"access_token": access_token, "token_type": "bearer", "user": {"id": admin.id, "email": admin.email, "role": admin.role}}
-        raise HTTPException(status_code=401, detail="Admin account not initialized yet")
-            
     key = db.query(models.AccessKey).filter(models.AccessKey.key_code == req.key_code).first()
     if not key:
         raise HTTPException(status_code=401, detail="Invalid Access Key")

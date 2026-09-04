@@ -28,6 +28,7 @@ export default function VoicePage() {
   const [rate, setRate] = useState(1.0);
   const [volume, setVolume] = useState(1.0);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [audioObj, setAudioObj] = useState<HTMLAudioElement | null>(null);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
 
   // STT State (Speech to Text)
@@ -91,36 +92,43 @@ export default function VoicePage() {
     }
   };
 
-  const handleSpeak = () => {
-    if (typeof window === "undefined" || !('speechSynthesis' in window)) {
-      alert("Text to speech not supported in this browser.");
-      return;
-    }
-
+  const handleSpeak = async () => {
     if (isPlaying) {
-      window.speechSynthesis.cancel();
+      if (audioObj) {
+        audioObj.pause();
+        audioObj.currentTime = 0;
+      }
       setIsPlaying(false);
       return;
     }
 
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(textToSpeak);
-    utterance.pitch = pitch;
-    utterance.rate = rate;
-    utterance.volume = volume;
+    if (!textToSpeak.trim()) return;
 
-    const voices = window.speechSynthesis.getVoices();
-    const voiceObj = VOICE_PRESETS.find(v => v.id === selectedVoice);
-    if (voiceObj && voices.length > 0) {
-      const match = voices.find(v => v.lang.includes(voiceObj.lang.split('-')[0]));
-      if (match) utterance.voice = match;
+    setIsPlaying(true);
+    try {
+      const formData = new FormData();
+      formData.append("text", textToSpeak);
+      formData.append("voice_id", selectedVoice);
+      formData.append("language", "en"); // Base UI is mostly English or handled by elevenlabs
+      
+      const res = await apiFetch("/voice/text-to-speech", {
+        method: "POST",
+        body: formData
+      });
+      
+      if (res && res.audio_url) {
+        const audio = new Audio(res.audio_url);
+        setAudioObj(audio);
+        audio.onended = () => setIsPlaying(false);
+        audio.onerror = () => setIsPlaying(false);
+        audio.play();
+      } else {
+        setIsPlaying(false);
+      }
+    } catch (e) {
+      console.error(e);
+      setIsPlaying(false);
     }
-
-    utterance.onstart = () => setIsPlaying(true);
-    utterance.onend = () => setIsPlaying(false);
-    utterance.onerror = () => setIsPlaying(false);
-
-    window.speechSynthesis.speak(utterance);
   };
 
   const handleVoiceTranslate = async () => {
@@ -149,12 +157,24 @@ export default function VoicePage() {
     }
   };
 
-  const speakCustomText = (text: string, langCode: string = "en-US") => {
-    if (typeof window === "undefined" || !('speechSynthesis' in window)) return;
-    window.speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(text);
-    u.lang = langCode;
-    window.speechSynthesis.speak(u);
+  const speakCustomText = async (text: string, langCode: string = "en-US") => {
+    try {
+      const formData = new FormData();
+      formData.append("text", text);
+      formData.append("language", langCode);
+      
+      const res = await apiFetch("/voice/text-to-speech", {
+        method: "POST",
+        body: formData
+      });
+      
+      if (res && res.audio_url) {
+        const audio = new Audio(res.audio_url);
+        audio.play();
+      }
+    } catch (e) {
+      console.error("TTS Failed:", e);
+    }
   };
 
   return (

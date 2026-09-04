@@ -70,7 +70,7 @@ Provide:
     ]
     
     try:
-        result = await api_hub.chat(messages)
+        result = await api_hub.chat(messages, max_tokens=1000)
         return {
             "content": result["content"],
             "platform": platform,
@@ -114,7 +114,7 @@ Make it detailed enough for AI image generators like Midjourney, DALL-E, or Stab
     ]
     
     try:
-        result = await api_hub.chat(messages)
+        result = await api_hub.chat(messages, max_tokens=1000)
         return {
             "prompt": result["content"],
             "style": style,
@@ -158,7 +158,7 @@ Make it suitable for AI video generators."""
     ]
     
     try:
-        result = await api_hub.chat(messages)
+        result = await api_hub.chat(messages, max_tokens=1000)
         return {
             "prompt": result["content"],
             "duration": duration,
@@ -198,7 +198,7 @@ Include:
     ]
     
     try:
-        result = await api_hub.chat(messages)
+        result = await api_hub.chat(messages, max_tokens=1000)
         return {
             "guide": result["content"],
             "original_format": original_format,
@@ -208,3 +208,89 @@ Include:
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Resize guide failed: {str(e)}")
+from pydantic import BaseModel
+
+class MediaDownloadRequest(BaseModel):
+    url: str
+
+@router.post("/download")
+async def download_media(req: MediaDownloadRequest):
+    import yt_dlp
+    ydl_opts = {
+        'quiet': True,
+        'no_warnings': True,
+        'skip_download': True,
+    }
+    try:
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            info = ydl.extract_info(req.url, download=False)
+            title = info.get('title', 'Unknown Title')
+            platform = info.get('extractor', 'Unknown Platform')
+            quality = info.get('resolution') or info.get('format', 'Unknown Quality')
+            video_url = info.get('url', req.url)
+            
+        return {
+            "title": title,
+            "platform": platform,
+            "quality": quality,
+            "url": video_url
+        }
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+@router.post("/storyboard")
+async def generate_storyboard(
+    video_title: str = Form(...),
+    duration: str = Form("60s (Shorts / Reels)"),
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user)
+):
+    """Generate a multi-scene video storyboard script with JSON output."""
+    prompt = f"""Create a highly engaging, viral video storyboard for a video titled/about: "{video_title}"
+Target Duration: {duration}
+
+Break it down into exactly 4 distinct scenes:
+1. The Hook
+2. The Problem/Context
+3. The Solution/Main Content
+4. The Call to Action
+
+For each scene, provide:
+- Scene title with timecodes
+- Visual & B-Roll description (what the camera sees)
+- Narration Script (exactly what the voiceover says)
+- Text Overlay (what is written on screen)
+
+IMPORTANT: The user input may be in Tamil, Tanglish, or English. If the input is in Tamil, generate the Narration Script and Text Overlay in native Tamil (not Tanglish).
+
+Return ONLY a valid JSON array of objects. Do not wrap it in markdown code blocks.
+Example format:
+[
+  {{
+    "scene": "Scene 1: The Hook (0s - 5s)",
+    "visual": "...",
+    "narration": "...",
+    "overlay": "..."
+  }},
+  ...
+]"""
+    
+    messages = [
+        {"role": "system", "content": "You are an expert video director and viral content strategist. You output strict JSON."},
+        {"role": "user", "content": prompt}
+    ]
+    
+    try:
+        result = await api_hub.chat(messages, max_tokens=2000)
+        content = result["content"].strip()
+        if content.startswith("```json"):
+            content = content[7:]
+        elif content.startswith("```"):
+            content = content[3:]
+        if content.endswith("```"):
+            content = content[:-3]
+            
+        import json
+        storyboard_data = json.loads(content.strip())
+        return storyboard_data
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Storyboard generation failed: {str(e)}")

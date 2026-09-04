@@ -131,7 +131,7 @@ async def analyze_crypto_market(
         res = await api_hub.chat([
             {"role": "system", "content": "You are a world-class AI Crypto Analyst providing objective market research."},
             {"role": "user", "content": prompt}
-        ])
+        ], max_tokens=1500)
         return {
             "status": "success",
             "analysis": res["content"],
@@ -242,7 +242,7 @@ async def analyze_candlestick(
         res = await api_hub.chat([
             {"role": "system", "content": "You are a professional Candlestick Technical Analyst."},
             {"role": "user", "content": prompt}
-        ])
+        ], max_tokens=1500)
         return {
             "status": "success",
             "analysis": res["content"],
@@ -318,7 +318,7 @@ async def predict_time_series_price(
         res = await api_hub.chat([
             {"role": "system", "content": "You are a quantitative crypto time-series forecasting engine."},
             {"role": "user", "content": prompt}
-        ])
+        ], max_tokens=1500)
 
         return {
             "status": "success",

@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
+import { getApiBaseUrl } from '../../../utils/api';
 import { 
   Bot, Terminal, Play, Settings, Zap, Brain, Shield, Users, 
   Building, Activity, CheckCircle2, Circle, ArrowLeft, Copy, Check,
@@ -68,7 +69,7 @@ export default function AutomationHub() {
 
     try {
       const API_URL = process.env.NEXT_PUBLIC_API_URL || '';
-      const response = await fetch(`${API_URL}/api/autonomous/run`, {
+      const response = await fetch(`${getApiBaseUrl()}/autonomous/run`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ goal, context })

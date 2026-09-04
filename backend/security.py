@@ -84,16 +84,13 @@ def get_current_user(
             headers={"WWW-Authenticate": "Bearer"},
         )
         
-    # 1. Master Admin Key
-    if extracted_token == "SAM-MASTER-ADMIN" or verify_master_key(extracted_token):
+    # 1. System Master Admin Key (env-configured only, never hardcoded)
+    if verify_master_key(extracted_token):
         return {"user_id": "admin_master", "role": "admin"}
-        
-    # 2. Guest Master Token
-    if extracted_token == "guest_master_token_2026":
-        return {"user_id": "guest_master", "role": "staff"}
-        
-    # 3. Dynamic Access Key (e.g. SAM-XXXX-XXXX)
-    if extracted_token.startswith("SAM-"):
+
+    # 2. Dynamic Access Key (e.g. SAM-XXXX-XXXX or sk-samai-)
+    if extracted_token.startswith("SAM-") or extracted_token.startswith("sk-samai-"):
+        db = None
         try:
             from database import SessionLocal
             import models
@@ -104,13 +101,14 @@ def get_current_user(
                     if key.max_uses == 0 or key.current_uses < key.max_uses:
                         key.current_uses += 1
                         db.commit()
-                        db.close()
                         return {"user_id": key.user_id or "key_user", "role": "staff"}
-            db.close()
         except Exception:
             pass
+        finally:
+            if db is not None:
+                db.close()
 
-    # 4. Standard JWT Token
+    # 3. Standard JWT Token
     try:
         payload = jwt.decode(extracted_token, SECRET_KEY, algorithms=[ALGORITHM])
         user_id: str = payload.get("user_id")
@@ -146,3 +144,52 @@ def require_staff(current_user: dict = Depends(get_current_user)):
 
 
 
+
+def require_api_credits(cost: int = 1):
+    def dependency(request: Request, user: dict = Depends(get_current_user)):
+        auth_header = request.headers.get("authorization")
+        api_key_header = request.headers.get("x-api-key")
+        
+        extracted_token = api_key_header
+        if not extracted_token and auth_header:
+            if auth_header.lower().startswith("bearer "):
+                extracted_token = auth_header[7:].strip()
+            else:
+                extracted_token = auth_header.strip()
+                
+        # System Master Admin bypasses billing (env-configured only)
+        if verify_master_key(extracted_token):
+            return user
+
+        if extracted_token and extracted_token.startswith("sk-samai-"):
+            from database import SessionLocal
+            import models
+            db = SessionLocal()
+            key = db.query(models.AccessKey).filter(models.AccessKey.key_code == extracted_token).first()
+            
+            if not key or key.status != "active":
+                db.close()
+                raise HTTPException(status_code=401, detail="Invalid API Key")
+                
+            if key.api_credit_balance < cost:
+                db.close()
+                raise HTTPException(status_code=402, detail=f"Payment Required: Insufficient API Credits. Cost is {cost}, balance is {key.api_credit_balance}.")
+                
+            # Deduct credits
+            key.api_credit_balance -= cost
+            
+            # Log usage
+            usage_log = models.ApiUsageLog(
+                key_id=key.id,
+                endpoint=request.url.path,
+                cost=cost,
+                client_ip=request.client.host if request.client else "unknown"
+            )
+            db.add(usage_log)
+            db.commit()
+            db.close()
+            return user
+            
+        # For legacy SAM- tokens or JWTs, allow for now or handle accordingly
+        return user
+    return dependency

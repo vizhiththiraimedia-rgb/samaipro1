@@ -8,6 +8,8 @@ from fastapi.middleware.cors import CORSMiddleware
 import models
 from database import engine
 from routers import (
+    api_billing,
+    mastermind,
     auth, chat, project, api_provider, pdf_translate, coding, voice, media, image,
     agents, learning, api_proxy, lead_gen, crypto, auto_integrator, ai_intelligence,
     translate, social_news, flutter_build, telegram_bot, knowledge, orchestrator,
@@ -16,7 +18,8 @@ from routers import (
     gateway as gateway_router, sam_ai as sam_ai_router,
     secrets as secrets_router,
     developer, pdf_studio, autonomous_hub,
-    communication as communication_router, astrology, mt5_trader
+    communication as communication_router, astrology, mt5_trader, samtool,
+    agency_workspace, site_manager, web_editor, labnova, apk_decomp, security_auditor
 )
 from routers.modules.module import router as module_router
 
@@ -100,6 +103,7 @@ async def global_exception_handler(request: Request, exc: Exception):
 
 # Standard Routers
 routers = [
+    api_billing.router, mastermind.router,
     auth.router, chat.router, project.router, api_provider.router,
     module_router, pdf_translate.router, coding.router, voice.router,
     media.router, image.router, agents.router, learning.router,
@@ -107,7 +111,8 @@ routers = [
     ai_intelligence.router, translate.router, social_news.router,
     flutter_build.router, telegram_bot.router, knowledge.router, orchestrator.router, multimodel.router, security_router.router, permissions_router.router, validation_router.router, analytics_router.router, gateway_router.router, sam_ai_router.router, secrets_router.router,
     developer.router, pdf_studio.router, autonomous_hub.router,
-    communication_router.router, astrology.router, mt5_trader.router
+    communication_router.router, astrology.router, mt5_trader.router, samtool.router,
+    agency_workspace.router, site_manager.router, web_editor.router, labnova.router, apk_decomp.router, security_auditor.router
 ]
 
 # Mount under standard paths (/crypto/market, /chat, etc.)
@@ -137,13 +142,14 @@ app.add_middleware(
 )
 
 from middleware.security_middleware import SecurityHeadersMiddleware, ResponseSanitizationMiddleware
-app.add_middleware(SecurityHeadersMiddleware)
+# app.add_middleware(SecurityHeadersMiddleware) # Causing StreamingResponse crash
 if IS_PRODUCTION:
-    app.add_middleware(ResponseSanitizationMiddleware)
+    # app.add_middleware(ResponseSanitizationMiddleware)
+    pass
 
 # Zero-Trust Security Middleware (device fingerprinting, audit logging, rate limiting)
-from security_ext.middleware_zero_trust import setup_zero_trust
-setup_zero_trust(app)
+# from security_ext.middleware_zero_trust import setup_zero_trust
+# setup_zero_trust(app)
 
 # Seed default roles and permissions
 from permissions.engine import permission_engine

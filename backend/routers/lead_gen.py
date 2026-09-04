@@ -643,10 +643,13 @@ async def generate_website_code(
     )
 
     try:
-        res = await api_hub.chat([
-            {"role": "system", "content": "You are a master web developer creating stunning Tailwind CSS HTML pages."},
-            {"role": "user", "content": prompt}
-        ])
+        res = await api_hub.chat(
+            messages=[
+                {"role": "system", "content": "You are a master web developer creating stunning Tailwind CSS HTML pages."},
+                {"role": "user", "content": prompt}
+            ],
+            max_tokens=4000
+        )
 
         html_code = res["content"].strip()
         if html_code.startswith("```html"):

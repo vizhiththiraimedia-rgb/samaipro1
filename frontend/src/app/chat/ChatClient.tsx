@@ -129,23 +129,15 @@ export default function ChatClient({ projectId, mode = "general" }: { projectId:
     <div style={{ display: "flex", flexDirection: "column", height: "100%", maxWidth: "900px", margin: "0 auto", padding: "1rem" }}>
       <div className="chat-messages" style={{ flex: 1, overflowY: "auto", paddingBottom: "120px" }}>
         {messages.map((msg) => (
-          <motion.div 
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            key={msg.id} 
-            className={`message-bubble ${msg.role === "user" ? "user" : "ai"}`}
-            style={{ 
-              alignSelf: msg.role === "user" ? "flex-end" : "flex-start",
-              maxWidth: "85%",
-              padding: "1.2rem",
-              borderRadius: "16px",
-              marginBottom: "1rem",
-              background: msg.role === "user" ? "var(--primary)" : "rgba(255,255,255,0.05)",
-              border: msg.role === "user" ? "none" : "1px solid var(--border)",
-              color: "#fff",
-              lineHeight: "1.6"
-            }}
-          >
+          <div key={msg.id} style={{ display: "flex", gap: "1.5rem", maxWidth: "850px", margin: "0 auto", width: "100%", marginBottom: "2rem", padding: "0 1rem" }}>
+            <div style={{
+              width: "30px", height: "30px", borderRadius: "4px", 
+              background: msg.role === "user" ? "#ececec" : "#10a37f",
+              display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+            }}>
+              <span style={{ fontWeight: "bold", color: msg.role === "user" ? "#171717" : "#fff", fontSize: "0.8rem" }}>{msg.role === "user" ? "U" : "AI"}</span>
+            </div>
+            <div style={{ flex: 1, color: "#ececec", lineHeight: "1.7", fontSize: "1rem", minWidth: 0 }}>
             {msg.role === "assistant" ? (
               <div className="prose prose-invert max-w-none">
                 <ReactMarkdown 
@@ -174,14 +166,15 @@ export default function ChatClient({ projectId, mode = "general" }: { projectId:
                     )
                   }
                 }}
-              >
+                >
                 {msg.content}
                 </ReactMarkdown>
               </div>
             ) : (
               <div style={{ whiteSpace: "pre-wrap" }}>{msg.content}</div>
             )}
-          </motion.div>
+            </div>
+          </div>
         ))}
         {loading && (
           <motion.div 
@@ -218,7 +211,14 @@ export default function ChatClient({ projectId, mode = "general" }: { projectId:
             )}
           </AnimatePresence>
 
-          <form onSubmit={sendMessage} style={{ display: "flex", gap: "0.5rem", background: "rgba(255,255,255,0.05)", border: "1px solid var(--border)", borderRadius: attachments.length > 0 ? "0 0 12px 12px" : "12px", padding: "0.5rem", backdropFilter: "blur(10px)" }}>
+          <form onSubmit={sendMessage} style={{ 
+            display: "flex", gap: "0.5rem", 
+            background: "#2f2f2f", 
+            border: "1px solid rgba(255,255,255,0.1)", 
+            borderRadius: attachments.length > 0 ? "0 0 24px 24px" : "24px", 
+            padding: "0.5rem 1rem",
+            boxShadow: "0 0 15px rgba(0,0,0,0.1)"
+          }}>
             <input 
               type="file" 
               multiple 
@@ -230,29 +230,31 @@ export default function ChatClient({ projectId, mode = "general" }: { projectId:
             <button 
               type="button" 
               onClick={() => fileInputRef.current?.click()}
-              style={{ background: "none", border: "none", color: "var(--text-muted)", padding: "0.5rem", cursor: "pointer", borderRadius: "8px", display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.2s" }}
-              onMouseOver={e => e.currentTarget.style.background = "rgba(255,255,255,0.1)"}
-              onMouseOut={e => e.currentTarget.style.background = "none"}
+              style={{ background: "transparent", border: "none", color: "#b4b4b4", padding: "0.6rem", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
             >
               <Paperclip size={20} />
             </button>
             
             <input
               type="text"
-              placeholder="Ask SAM AI or upload files..."
+              placeholder="Message SAM AI..."
               value={input}
               onChange={(e) => setInput(e.target.value)}
               disabled={loading}
-              style={{ flex: 1, background: "none", border: "none", color: "#fff", outline: "none", padding: "0 0.5rem", fontSize: "1rem" }}
+              style={{ flex: 1, background: "none", border: "none", color: "#ececec", outline: "none", padding: "0 1rem", fontSize: "1rem" }}
               autoFocus
             />
             
             <button 
               type="submit" 
               disabled={loading || (!input.trim() && attachments.length === 0)}
-              style={{ background: (!input.trim() && attachments.length === 0) ? "rgba(255,255,255,0.1)" : "var(--primary)", border: "none", color: "#fff", padding: "0.5rem 1rem", cursor: loading ? "wait" : "pointer", borderRadius: "8px", display: "flex", alignItems: "center", gap: "0.5rem", fontWeight: "600", transition: "all 0.2s", opacity: loading ? 0.7 : 1 }}
+              style={{ 
+                background: (!input.trim() && attachments.length === 0) ? "#424242" : "#ececec", 
+                border: "none", color: (!input.trim() && attachments.length === 0) ? "#b4b4b4" : "#171717", padding: "0.6rem", cursor: loading ? "wait" : "pointer", 
+                borderRadius: "8px", display: "flex", alignItems: "center", justifyContent: "center"
+              }}
             >
-              <Send size={16} /> <span className="hide-on-mobile">Send</span>
+              <Send size={18} />
             </button>
           </form>
         </div>

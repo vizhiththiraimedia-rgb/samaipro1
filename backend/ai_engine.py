@@ -3,10 +3,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-def get_ai_response(user_message: str, chat_history: list = None, system_prompt: str = None) -> str:
-    """
-    Send a message to SAM AI and get an ultra-fast response.
-    """
+async def get_ai_response(user_message: str, chat_history: list = None, system_prompt: str = None) -> str:
     from prompts import SAMAI_SYSTEM_PROMPT
     default_prompt = SAMAI_SYSTEM_PROMPT
     messages = [
@@ -15,27 +12,22 @@ def get_ai_response(user_message: str, chat_history: list = None, system_prompt:
     
     if chat_history:
         for chat in chat_history:
-            messages.append({"role": chat.role, "content": chat.content})
+            # Assuming chat object has .role and .content, otherwise if dict use chat['role']
+            role = getattr(chat, 'role', chat.get('role', 'user') if isinstance(chat, dict) else 'user')
+            content = getattr(chat, 'content', chat.get('content', '') if isinstance(chat, dict) else str(chat))
+            messages.append({"role": role, "content": content})
             
     messages.append({"role": "user", "content": user_message})
     
     try:
         from api_hub import api_hub
-        import concurrent.futures
-
-        def _call_hub():
-            import asyncio
-            return asyncio.run(api_hub.chat(messages))
-
-        with concurrent.futures.ThreadPoolExecutor() as executor:
-            future = executor.submit(_call_hub)
-            result = future.result(timeout=30.0)
-            return result["content"]
+        result = await api_hub.chat(messages, max_tokens=4000)
+        return result["content"]
     except Exception as e:
         print(f"API Hub Notice/Fallback: {e}")
         user_lower = user_message.lower().strip()
         if any(w in user_lower for w in ["hi", "hello", "vanakkam", "hey", "ayubowan"]):
-            return "Hello! 👋 I am SAM AI. How can I assist you today?"
+            return "Hello! ?? I am SAM AI. How can I assist you today?"
         elif any(w in user_lower for w in ["who are you", "name", "your name"]):
             return "I am SAM AI, your personal intelligent assistant powered by Google Gemini and multi-model AI engines."
         elif any(w in user_lower for w in ["help", "what can you do"]):

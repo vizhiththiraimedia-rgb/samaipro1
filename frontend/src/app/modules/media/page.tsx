@@ -78,39 +78,37 @@ export default function MediaPage() {
     }
   };
 
-  const handleGenerateStoryboard = () => {
+  const handleGenerateStoryboard = async () => {
     if (!videoTitle.trim()) return;
     setStoryboardLoading(true);
 
-    setTimeout(() => {
+    try {
+      const formData = new FormData();
+      formData.append("video_title", videoTitle);
+      formData.append("duration", videoDuration);
+
+      const data = await apiFetch("/media/storyboard", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (data && Array.isArray(data)) {
+        setStoryboardOutput(data);
+      }
+    } catch (err) {
+      console.error("Storyboard generation failed", err);
+      // Fallback
       setStoryboardOutput([
         {
           scene: "Scene 1: The Hook (0s - 5s)",
-          visual: "Cinematic close-up of developer watching AI terminal auto-generate full-stack application code.",
-          narration: "What if you could build and deploy an entire SaaS platform without writing a single line of boilerplate?",
-          overlay: "🔥 Build SaaS in 10 Minutes"
-        },
-        {
-          scene: "Scene 2: The Problem (5s - 18s)",
-          visual: "Quick montage of complex API documentation, error logs, and multiple open browser tabs.",
-          narration: "Normally, connecting APIs, databases, and neural models takes weeks of manual configuration.",
-          overlay: "❌ The Old Way: Weeks of Setup"
-        },
-        {
-          scene: "Scene 3: The Solution (18s - 42s)",
-          visual: "Screen capture of SAM AI Autonomous Hub delegating tasks to Planner, Coder, and QA agents live.",
-          narration: "With SAM AI, you define a single mission goal. Autonomous agent swarms handle research, coding, QA, and deployment instantly.",
-          overlay: "⚡ 6 Autonomous Agents Swarm"
-        },
-        {
-          scene: "Scene 4: The Call to Action (42s - 60s)",
-          visual: "Live deployed web application dashboard running with glowing neon theme and clean charts.",
-          narration: "Try the SAM AI platform today and launch your next big project in minutes. Link in bio!",
-          overlay: "🚀 Launch Now at samaipro.vercel.app"
+          visual: "Error occurred",
+          narration: "Could not generate storyboard. Please check your backend connection.",
+          overlay: "⚠️ Error"
         }
       ]);
+    } finally {
       setStoryboardLoading(false);
-    }, 700);
+    }
   };
 
   const handleCopy = (text: string) => {

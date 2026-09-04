@@ -74,7 +74,13 @@ export default function ChatDashboard() {
             </h2>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", gap: "1rem" }}>
               
-              <motion.div whileHover={{ y: -5 }} onClick={() => startSession('history')} className="glass-panel" style={{ cursor: "pointer", padding: "1.5rem", borderTop: "4px solid #f59e0b" }}>
+               <motion.div whileHover={{ y: -5 }} onClick={() => startSession('samaichat')} className="glass-panel" style={{ cursor: "pointer", padding: "1.5rem", borderTop: "4px solid #10a37f", background: "rgba(16, 163, 127, 0.05)" }}>
+                 <MessageSquare size={28} color="#10a37f" style={{ marginBottom: "1rem" }} />
+                 <h3 style={{ margin: "0 0 0.5rem 0" }}>SamaiChat (ChatGPT)</h3>
+                 <p style={{ color: "var(--text-muted)", margin: 0, fontSize: "0.9rem" }}>General-purpose AI assistant like ChatGPT, optimized for natural conversation.</p>
+               </motion.div>
+
+               <motion.div whileHover={{ y: -5 }} onClick={() => startSession('history')} className="glass-panel" style={{ cursor: "pointer", padding: "1.5rem", borderTop: "4px solid #f59e0b" }}>
                 <Landmark size={28} color="#f59e0b" style={{ marginBottom: "1rem" }} />
                 <h3 style={{ margin: "0 0 0.5rem 0" }}>Historical & Cultural</h3>
                 <p style={{ color: "var(--text-muted)", margin: 0, fontSize: "0.9rem" }}>Deep dive into 2000+ years of SL history, heritage, and archaeology.</p>
