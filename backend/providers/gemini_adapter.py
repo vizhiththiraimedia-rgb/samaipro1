@@ -133,12 +133,16 @@ class GeminiAdapter(ProviderAdapter):
                     generation_config=generation_config,
                 )
 
-            prompt = current_contents[-1] if current_contents else "Hello"
+            if history:
+                if current_contents:
+                    history.append({"role": "user", "parts": current_contents})
+                payload_contents = history
+            else:
+                payload_contents = current_contents[-1] if current_contents else "Hello"
 
             response = await asyncio.to_thread(
                 lambda: gen_model.generate_content(
-                    contents=prompt,
-                    history=history if history else None,
+                    contents=payload_contents,
                     request_options={"timeout": 60}
                 )
             )
