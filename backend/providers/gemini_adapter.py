@@ -106,11 +106,13 @@ class GeminiAdapter(ProviderAdapter):
                             if item.get("type") == "text":
                                 parts.append(item.get("text", ""))
                             elif item.get("type") == "image_url":
-                                import base64
                                 img_data = item["image_url"]["url"]
                                 if img_data.startswith("data:"):
+                                    mime_type = img_data.split(";")[0].split(":")[1]
                                     img_data = img_data.split(",")[1]
-                                parts.append({"image": base64.b64decode(img_data)})
+                                else:
+                                    mime_type = "image/jpeg"
+                                parts.append({"inline_data": {"mime_type": mime_type, "data": img_data}})
                     current_contents.append(parts)
             elif role == "assistant":
                 history.append({"role": "user", "parts": current_contents if current_contents else ["placeholder"]})
