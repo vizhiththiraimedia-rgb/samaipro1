@@ -1,6 +1,6 @@
 const nextConfig = {
   serverExternalPackages: ['@node-jhora/core', '@node-jhora/prediction', '@node-jhora/analytics'],
-  output: 'standalone',
+  // output: 'standalone',
   images: {
     unoptimized: true,
   },
