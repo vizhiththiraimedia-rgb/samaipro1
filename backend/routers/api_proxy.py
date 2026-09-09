@@ -32,7 +32,7 @@ async def chat_completions(request: Request):
             key = gemini_keys_str.split(",")[0].strip() if gemini_keys_str else ""
             if key and key != "your_gemini_api_key_here":
                 from providers.gemini_adapter import GeminiAdapter
-                adapter = GeminiAdapter(api_key=key, model=model)
+                adapter = GeminiAdapter(name="Gemini_Native", api_key=key, model=model)
                 res = await adapter.chat(messages=messages, model=model, **kwargs)
                 return {
                     "id": "chatcmpl-samai-proxy",
