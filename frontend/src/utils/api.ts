@@ -8,11 +8,11 @@ export const getToken = (): string | null => {
   if (typeof window !== 'undefined') {
     const local = localStorage.getItem('token');
     if (!local || local.split('.').length < 3) {
-      return 'SAM-MASTER-ADMIN';
+      return 'sk-samai-iddjkdL6A-9Z-1WAyj489toPWny5UOrNJp8WTqTZPxaj48jxplCNgw';
     }
-    return local || 'SAM-MASTER-ADMIN';
+    return local || 'sk-samai-iddjkdL6A-9Z-1WAyj489toPWny5UOrNJp8WTqTZPxaj48jxplCNgw';
   }
-  return 'SAM-MASTER-ADMIN';
+  return 'sk-samai-iddjkdL6A-9Z-1WAyj489toPWny5UOrNJp8WTqTZPxaj48jxplCNgw';
 };
 
 export const setToken = (token: string) => {
