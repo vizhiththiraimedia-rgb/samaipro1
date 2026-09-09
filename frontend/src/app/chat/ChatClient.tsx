@@ -26,7 +26,7 @@ export default function ChatClient({ projectId, mode = "general" }: { projectId:
     const init = async () => {
       try {
         const url = `/api/chat/${projectId || "default"}`;
-        const token = typeof window !== 'undefined' ? localStorage.getItem('token') || 'sk-samai-iddjkdL6A-9Z-1WAyj489toPWny5UOrNJp8WTqTZPxaj48jxplCNgw';
+        const token = typeof window !== 'undefined' ? (localStorage.getItem('token') || 'sk-samai-iddjkdL6A-9Z-1WAyj489toPWny5UOrNJp8WTqTZPxaj48jxplCNgw') : 'sk-samai-iddjkdL6A-9Z-1WAyj489toPWny5UOrNJp8WTqTZPxaj48jxplCNgw';
         const res = await fetch(url, {
           headers: token ? { Authorization: `Bearer ${token}` } : {}
         });
@@ -99,7 +99,7 @@ export default function ChatClient({ projectId, mode = "general" }: { projectId:
       });
 
       const url = `/api/chat/${projectId || "default"}`;
-      const token = typeof window !== 'undefined' ? localStorage.getItem('token') || 'sk-samai-iddjkdL6A-9Z-1WAyj489toPWny5UOrNJp8WTqTZPxaj48jxplCNgw';
+      const token = typeof window !== 'undefined' ? (localStorage.getItem('token') || 'sk-samai-iddjkdL6A-9Z-1WAyj489toPWny5UOrNJp8WTqTZPxaj48jxplCNgw') : 'sk-samai-iddjkdL6A-9Z-1WAyj489toPWny5UOrNJp8WTqTZPxaj48jxplCNgw';
       const res = await fetch(url, {
         method: "POST",
         headers: token ? {
