@@ -1,49 +1,50 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Abhaya+Libre:wght@400;500;600;700;800&family=Noto+Sans+Sinhala:wght@400;500;600;700&family=Noto+Serif+Sinhala:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500;600&display=swap');
+
+@import "./sam-tokens.css";
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* ===== SAM AI — Professional dark-first music studio ===== */
 @layer base {
   :root {
-    --background: 48 100% 96%; /* Creamy off-white/beige */
-    --foreground: 20 20% 20%; /* Dark text */
-    --card: 0 0% 100%; /* White cards */
-    --card-foreground: 20 20% 20%;
-    --primary: 353 74% 41%; /* Deep Maroon/Red */
-    --primary-foreground: 0 0% 100%; /* White text on primary */
-    --secondary: 45 100% 58%; /* Golden Yellow */
-    --secondary-foreground: 0 0% 10%; /* Dark text on secondary */
-    --muted: 48 30% 90%;
-    --muted-foreground: 20 10% 40%;
-    --accent: 45 100% 58%; /* Golden Yellow for accents */
-    --accent-foreground: 0 0% 10%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 48 20% 85%;
-    --input: 48 20% 85%;
-    --ring: 353 74% 41%; /* Focus ring matches primary maroon */
-    --radius: 0.75rem;
+    /* Map Tailwind semantic tokens to SAM tokens for compatibility */
+    --background: var(--sam-bg);
+    --foreground: var(--sam-text-primary);
+    --card: var(--sam-surface);
+    --card-foreground: var(--sam-text-primary);
+    --primary: var(--sam-accent);
+    --primary-foreground: 0 0% 100%;
+    --secondary: var(--sam-accent-muted);
+    --secondary-foreground: var(--sam-text-primary);
+    --muted: var(--sam-surface-panel);
+    --muted-foreground: var(--sam-text-secondary);
+    --accent: var(--sam-accent);
+    --accent-foreground: 0 0% 100%;
+    --border: var(--sam-border);
+    --input: var(--sam-border);
+    --ring: var(--sam-accent);
+    --radius: 0.5rem;
   }
 
   .dark {
-    --background: 48 100% 96%; /* Creamy off-white/beige */
-    --foreground: 20 20% 20%; /* Dark text */
-    --card: 0 0% 100%; /* White cards */
-    --card-foreground: 20 20% 20%;
-    --primary: 353 74% 41%; /* Deep Maroon/Red */
-    --primary-foreground: 0 0% 100%; /* White text on primary */
-    --secondary: 45 100% 58%; /* Golden Yellow */
-    --secondary-foreground: 0 0% 10%; /* Dark text on secondary */
-    --muted: 48 30% 90%;
-    --muted-foreground: 20 10% 40%;
-    --accent: 45 100% 58%; /* Golden Yellow for accents */
-    --accent-foreground: 0 0% 10%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 48 20% 85%;
-    --input: 48 20% 85%;
-    --ring: 353 74% 41%; /* Focus ring matches primary maroon */
+    --background: var(--sam-bg);
+    --foreground: var(--sam-text-primary);
+    --card: var(--sam-surface);
+    --card-foreground: var(--sam-text-primary);
+    --primary: var(--sam-accent);
+    --primary-foreground: 0 0% 100%;
+    --secondary: var(--sam-accent-muted);
+    --secondary-foreground: var(--sam-text-primary);
+    --muted: var(--sam-surface-panel);
+    --muted-foreground: var(--sam-text-secondary);
+    --accent: var(--sam-accent);
+    --accent-foreground: 0 0% 100%;
+    --border: var(--sam-border);
+    --input: var(--sam-border);
+    --ring: var(--sam-accent);
+    --radius: 0.5rem;
   }
 }
 
@@ -54,32 +55,30 @@
   body {
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
-    font-family: 'Inter', 'Noto Sans Sinhala', 'Abhaya Libre', sans-serif;
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
     font-feature-settings: "rlig" 1, "calt" 1;
+    overflow-x: hidden;
+  }
+  /* Remove the default theme that was set — now dark-first */
+  .dark body {
+    background-color: hsl(var(--background));
   }
 }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
+@layer components {
+  .sam-card {
+    @apply bg-[hsl(var(--sam-surface))] border border-[hsl(var(--sam-border))] text-[hsl(var(--sam-text-primary))] shadow-md;
   }
-  .scrollbar-hide {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
+  .sam-card-elevated {
+    @apply bg-[hsl(var(--sam-surface-elevated))] border border-[hsl(var(--sam-border))] text-[hsl(var(--sam-text-primary))] shadow-lg;
   }
-  .scrollbar-hide::-webkit-scrollbar {
-    display: none;
+  .sam-btn-primary {
+    @apply bg-[hsl(var(--sam-accent))] text-white font-medium rounded-md transition-all duration-150 hover:brightness-110 disabled:opacity-50;
   }
-  .cosmic-gradient {
-    background: linear-gradient(135deg, hsl(262.1 83.3% 57.8%), hsl(280 83.3% 57.8%), hsl(300 83.3% 57.8%));
+  .sam-btn-ghost {
+    @apply hover:bg-[hsl(var(--sam-surface-panel))] text-[hsl(var(--sam-text-secondary))] font-medium rounded-md transition-colors;
   }
-  .gold-gradient {
-    background: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-  .elegant-sinhala {
-    font-family: 'Abhaya Libre', 'Noto Serif Sinhala', serif;
+  .sam-input {
+    @apply bg-[hsl(var(--sam-surface-panel))] border border-[hsl(var(--sam-border))] text-[hsl(var(--sam-text-primary))] placeholder-[hsl(var(--sam-text-muted))] rounded-md focus:outline-none focus:border-[hsl(var(--sam-accent))] transition-colors;
   }
 }

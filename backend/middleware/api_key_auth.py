@@ -85,9 +85,18 @@ def get_api_key(
     """
     api_key = request.headers.get("x-api-key")
     if not api_key:
-        raise HTTPException(status_code=401, detail="Missing x-api-key header")
-
-    service_info = api_key_auth.validate_service_key(api_key)
+        # Fallback for local testing from Next.js without API key
+        if os.getenv("ENVIRONMENT", "development") != "production":
+            service_info = {
+                "service_name": "Local Dev",
+                "service_slug": "local-dev",
+                "credits_balance": 9999,
+                "is_active": True,
+            }
+        else:
+            raise HTTPException(status_code=401, detail="Missing x-api-key header")
+    else:
+        service_info = api_key_auth.validate_service_key(api_key)
 
     request.state.service_info = service_info
     request.state.service_name = service_info["service_name"]

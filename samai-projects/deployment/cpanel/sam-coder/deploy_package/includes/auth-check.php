@@ -5,7 +5,7 @@
 // Redirects to login if not authenticated, shows 402 page if no credits.
 // =========================================================================
 
-require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/../config.php';
 
 function requireAuth($api, $session) {
     if (!$session->isLoggedIn()) {

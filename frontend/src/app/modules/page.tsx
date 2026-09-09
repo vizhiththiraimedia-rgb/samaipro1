@@ -54,7 +54,8 @@ const modules: Module[] = [
   { id: "ai-intelligence", title: "24/7 System Intelligence", description: "AI market monitoring, performance diagnostics, and automated admin digests.", icon: Activity, href: "/modules/ai-intelligence", color: "#f43f5e" },
   { id: "apk-decomp", title: "AtoZ-DecompEngine", description: "Upload APKs, Auto-Decompile, Security Audit, and Generate Reverse Engineering Reports.", icon: ShieldAlert, href: "/modules/apk-decomp", color: "#ef4444" },
   { id: "admin-keys", title: "Admin: Access Keys", description: "Generate and manage dynamic access tokens for users.", icon: KeyRound, href: "/modules/admin-keys", color: "#000000" },
-  { id: "communication-cloud", title: "SAM Communication Cloud", description: "Unified RTC API with multi-provider routing, failover, video, audio, meetings, and recording.", icon: Radio, href: "/modules/communication-cloud", color: "#6366f1" }
+  { id: "communication-cloud", title: "SAM Communication Cloud", description: "Unified RTC API with multi-provider routing, failover, video, audio, meetings, and recording.", icon: Radio, href: "/modules/communication-cloud", color: "#6366f1" },
+  { id: "sammastermind", title: "SAM Mastermind", description: "Advanced AI reasoning, planning and strategic problem solving.", icon: Brain, href: "/modules/sammastermind", color: "#eab308" }
 ];
 
 const containerVariants: Variants = {
@@ -82,7 +83,6 @@ export default function ModulesPage() {
   });
 
   return (
-    <AdminGate onValidSession={setRole}>
     <div className="page-container" style={{ minHeight: "100vh", padding: "4rem 2rem", background: "linear-gradient(to bottom right, var(--bg-dark), #0f0f16)" }}>
       <motion.div 
         initial={{ opacity: 0, y: -20 }}
@@ -107,14 +107,14 @@ export default function ModulesPage() {
           </p>
         </div>
 
-        <motion.div 
+          <motion.div 
           variants={containerVariants}
           initial="hidden"
           animate="visible"
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
-            gap: "1.5rem"
+            gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))",
+            gap: "1.25rem"
           }}
         >
           {visibleModules.map((mod) => {
@@ -123,16 +123,16 @@ export default function ModulesPage() {
               <Link href={mod.href} key={mod.id} style={{ textDecoration: "none" }}>
                 <motion.div
                   variants={itemVariants}
-                  whileHover={{ y: -8, scale: 1.02, boxShadow: `0 20px 40px -10px ${mod.color}40` }}
+                  whileHover={{ y: -6, scale: 1.02, boxShadow: `0 15px 30px -10px ${mod.color}40` }}
                   whileTap={{ scale: 0.98 }}
                   style={{
-                    padding: "2rem",
+                    padding: "1.25rem",
                     height: "100%",
                     display: "flex",
                     flexDirection: "column",
                     justifyContent: "space-between",
                     cursor: "pointer",
-                    borderRadius: "20px",
+                    borderRadius: "16px",
                     border: "1px solid rgba(255, 255, 255, 0.05)",
                     background: "rgba(25, 25, 35, 0.4)",
                     backdropFilter: "blur(10px)",
@@ -140,26 +140,26 @@ export default function ModulesPage() {
                     overflow: "hidden"
                   }}
                 >
-                  <div style={{ position: "absolute", top: 0, right: 0, width: "150px", height: "150px", background: `radial-gradient(circle, ${mod.color}15 0%, transparent 70%)`, transform: "translate(30%, -30%)", pointerEvents: "none" }} />
+                  <div style={{ position: "absolute", top: 0, right: 0, width: "100px", height: "100px", background: `radial-gradient(circle, ${mod.color}15 0%, transparent 70%)`, transform: "translate(30%, -30%)", pointerEvents: "none" }} />
                   
                   <div>
                     <div style={{
-                      width: "60px",
-                      height: "60px",
-                      borderRadius: "16px",
+                      width: "48px",
+                      height: "48px",
+                      borderRadius: "12px",
                       background: `linear-gradient(135deg, ${mod.color}33, ${mod.color}11)`,
                       border: `1px solid ${mod.color}33`,
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
-                      marginBottom: "1.5rem",
-                      boxShadow: `0 8px 16px -4px ${mod.color}22`
+                      marginBottom: "1rem",
+                      boxShadow: `0 6px 12px -4px ${mod.color}22`
                     }}>
-                      <Icon size={28} color={mod.color} strokeWidth={1.5} />
+                      <Icon size={22} color={mod.color} strokeWidth={1.5} />
                     </div>
                     <h3 style={{
-                      fontSize: "1.25rem",
-                      marginBottom: "0.75rem",
+                      fontSize: "1.1rem",
+                      marginBottom: "0.5rem",
                       color: "#fff",
                       fontWeight: "600",
                       letterSpacing: "-0.01em"
@@ -168,15 +168,15 @@ export default function ModulesPage() {
                     </h3>
                     <p style={{
                       color: "rgba(255, 255, 255, 0.6)",
-                      fontSize: "0.95rem",
-                      lineHeight: "1.6"
+                      fontSize: "0.85rem",
+                      lineHeight: "1.5"
                     }}>
                       {mod.description}
                     </p>
                   </div>
 
                   <div style={{
-                    marginTop: "2rem",
+                    marginTop: "1.25rem",
                     display: "flex",
                     alignItems: "center",
                     gap: "0.5rem",
@@ -223,6 +223,5 @@ export default function ModulesPage() {
         </motion.div>
       </motion.div>
     </div>
-    </AdminGate>
   );
 }

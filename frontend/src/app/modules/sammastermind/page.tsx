@@ -20,7 +20,7 @@ export default function SamMastermindPage() {
   const checkStatus = async () => {
     try {
       const { getApiBaseUrl } = await import("../../../utils/api");
-      const res = await fetch(`${getApiBaseUrl()}/mastermind/status`);
+      const res = await fetch(`${getApiBaseUrl()}/api/mastermind/status`);
       const data = await res.json();
       if (data.status === "ready") {
         setModelStatus("Ready (Offline Mode)");
@@ -47,7 +47,7 @@ export default function SamMastermindPage() {
     setModelStatus("Starting Download...");
     try {
       const { getApiBaseUrl } = await import("../../../utils/api");
-      await fetch(`${getApiBaseUrl()}/mastermind/download`, { method: "POST" });
+      await fetch(`${getApiBaseUrl()}/api/mastermind/download`, { method: "POST" });
     } catch (e) {
       console.error(e);
       setLoading(false);
@@ -62,7 +62,7 @@ export default function SamMastermindPage() {
     
     try {
       const { getApiBaseUrl } = await import("../../../utils/api");
-      const res = await fetch(`${getApiBaseUrl()}/mastermind/chat`, {
+      const res = await fetch(`${getApiBaseUrl()}/api/mastermind/chat`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: input })

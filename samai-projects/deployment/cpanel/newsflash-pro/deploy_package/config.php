@@ -1,14 +1,14 @@
 <?php
 // =========================================================================
 // SAM AI - Service Configuration: NewsFlash Pro
-// Auto-generated: 2026-09-04T02:56:23.913304
+// Auto-generated: 2026-09-05T03:42:25.561597
 // =========================================================================
 
 define('ENVIRONMENT', 'production');
 define('SAMAI_API_BASE', 'https://samai.com');
 define('SERVICE_NAME', 'NewsFlash Pro');
 define('SERVICE_SLUG', 'newsflash-pro');
-define('SERVICE_KEY', 'sk-samai-testkey-abc123def456');
+define('SERVICE_KEY', 'svc_newsflash-pro_34ecab844395');
 define('SERVICE_ENDPOINT_PREFIX', '/social-news');
 
 // Theme
@@ -18,7 +18,7 @@ define('THEME_COLOR_HOVER', '#db3030');
 // Site Info
 define('SITE_TITLE', 'NewsFlash Pro');
 define('SITE_TAGLINE', 'Generate AI social media posts from news URLs');
-define('SITE_DOMAIN', 'https://newsflash.sam.ai');
+define('SITE_DOMAIN', 'https://newsflash-pro.sam.ai');
 
 // Credit Costs (from api_registry.json)
 define('CREDIT_COST_GENERATE_POST', 2);

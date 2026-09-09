@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TXFLIX - Partner Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background-color: #0f172a; color: white; }
+        .glass-panel { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-4">
+
+    <div class="text-center mb-10">
+        <h1 class="text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-orange-500 mb-2">TXFLIX</h1>
+        <p class="text-gray-400">Next-Gen OTT Platform - Web3 Automation Demo</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl w-full">
+        
+        <!-- PayPal Simulation Card -->
+        <div class="glass-panel rounded-2xl p-8 text-center relative overflow-hidden group">
+            <div class="absolute inset-0 bg-blue-500/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            <i class="fa-brands fa-paypal text-5xl text-blue-400 mb-4"></i>
+            <h2 class="text-2xl font-bold mb-2">Premium Subscription</h2>
+            <p class="text-gray-400 mb-6">Price: ₹500 / month</p>
+            
+            <button onclick="triggerPayPal()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-6 rounded-lg transition-colors flex justify-center items-center gap-2">
+                <i class="fa-solid fa-credit-card"></i> Pay via PayPal
+            </button>
+            <p class="text-xs text-blue-300 mt-4 opacity-70">Triggers 20% SAMAI Auto-Buyback</p>
+        </div>
+
+        <!-- Voucher Simulation Card -->
+        <div class="glass-panel rounded-2xl p-8 text-center relative overflow-hidden group">
+            <div class="absolute inset-0 bg-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            <i class="fa-solid fa-ticket text-5xl text-purple-400 mb-4"></i>
+            <h2 class="text-2xl font-bold mb-2">Activate Voucher Card</h2>
+            <p class="text-gray-400 mb-6">Enter your physical scratch card PIN</p>
+            
+            <div class="flex gap-2 mb-4">
+                <input type="text" id="voucherCode" value="TX-500-XYZ89" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-center font-mono focus:outline-none focus:border-purple-500" readonly>
+            </div>
+            
+            <button onclick="triggerVoucher()" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-bold py-3 px-6 rounded-lg transition-colors flex justify-center items-center gap-2">
+                <i class="fa-solid fa-wand-magic-sparkles"></i> Activate Card
+            </button>
+            <p class="text-xs text-purple-300 mt-4 opacity-70">Generates Custodial Wallet & On-chain Volume</p>
+        </div>
+
+    </div>
+
+    <!-- Status Logs -->
+    <div class="max-w-4xl w-full mt-8">
+        <div class="glass-panel rounded-xl p-4">
+            <h3 class="text-lg font-bold mb-2 flex items-center gap-2"><i class="fa-solid fa-terminal"></i> System Logs</h3>
+            <div id="logs" class="bg-black/50 rounded-lg p-4 font-mono text-sm h-48 overflow-y-auto text-green-400 flex flex-col gap-1">
+                <div>> Ready to process payments...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function logMessage(msg, type='info') {
+            const logs = document.getElementById('logs');
+            const color = type === 'error' ? 'text-red-400' : 'text-green-400';
+            const time = new Date().toLocaleTimeString();
+            logs.innerHTML += `<div class="${color}">[${time}] > ${msg}</div>`;
+            logs.scrollTop = logs.scrollHeight;
+        }
+
+        async function triggerPayPal() {
+            logMessage("Initiating PayPal Payment (₹500)...", "info");
+            try {
+                const response = await fetch('webhook_trigger.php?action=paypal', { method: 'POST' });
+                const data = await response.json();
+                if(data.status === 'success') {
+                    logMessage("Payment Success! Background SAMAI Auto-Buyback Triggered.", "info");
+                } else {
+                    logMessage("Error triggering Node.js Webhook: " + data.message, "error");
+                }
+            } catch (e) {
+                logMessage("Network Error. Is the PHP server running?", "error");
+            }
+        }
+
+        async function triggerVoucher() {
+            const code = document.getElementById('voucherCode').value;
+            logMessage(`Verifying Voucher PIN: ${code}...`, "info");
+            try {
+                const response = await fetch('webhook_trigger.php?action=voucher', { method: 'POST' });
+                const data = await response.json();
+                if(data.status === 'success') {
+                    logMessage(`Voucher Activated! Web3 Custodial Wallet Generated: ${data.data.walletGenerated}`, "info");
+                    logMessage(`Background On-chain volume transactions queued successfully.`, "info");
+                } else {
+                    logMessage("Error triggering Node.js Webhook: " + data.message, "error");
+                }
+            } catch (e) {
+                logMessage("Network Error. Is the PHP server running?", "error");
+            }
+        }
+    </script>
+</body>
+</html>

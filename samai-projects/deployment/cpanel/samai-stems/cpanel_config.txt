@@ -1,0 +1,15 @@
+# cPanel Configuration for SAM AI Stems (samai-stems)
+# Deploy this site by:
+# 1. Creating a subdomain or addon domain in cPanel
+# 2. Pointing the document root to the service directory
+# 3. Copying all files from the generated directory
+#
+# Domain: samai-stems.sam.ai
+# Document Root: /home/samaiuser/samai-projects/samai-stems/public_html
+# PHP Version: 8.2+
+#
+# Required PHP extensions: curl, mbstring, openssl, json
+# Required environment variables:
+#   SAMAI_API_BASE=https://samai.com
+#   SAMAI_SERVICE_KEY=sk-samai-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+API Key: svc_samai-stems_deadbeef1234

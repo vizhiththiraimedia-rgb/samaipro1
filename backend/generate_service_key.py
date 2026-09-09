@@ -39,25 +39,21 @@ def generate_service_key(service_slug: str, credits_granted: int = 1000, descrip
 
         # Check if service already has a key
         existing = db.query(models.ServiceAPIKey).filter(
-            models.ServiceAPIKey.service_slug == service_slug
+            models.ServiceAPIKey.service_name == service_slug
         ).first()
 
-        if existing and existing.is_active:
+        if existing and existing.status == 'active':
             print(f"WARNING: Service '{service_slug}' already has an active key.")
-            print(f"Revoking old key (prefix: {existing.api_key_prefix})...")
-            existing.is_active = False
+            print(f"Revoking old key...")
+            existing.status = 'revoked'
             existing.revoked_at = __import__("datetime").datetime.utcnow()
             db.commit()
 
-        # Create new key
         new_key = models.ServiceAPIKey(
             service_name=service_slug.replace("-", " ").title(),
-            service_slug=service_slug,
             api_key_hash=key_hash,
-            api_key_prefix=key_prefix,
-            credits_balance=credits_granted,
-            is_active=True,
-            description=description,
+            credits_granted=credits_granted,
+            status="active",
         )
         db.add(new_key)
         db.commit()

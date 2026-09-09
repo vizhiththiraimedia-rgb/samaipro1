@@ -16,7 +16,7 @@
   --primary-hover: #1a7f64;
   --accent: #10a37f;
   --border: rgba(255,255,255,0.1);
-  --glass-bg: #212121;
+  --glass-bg: #2f2f2f;
   --glass-border: rgba(255,255,255,0.1);
   --error: #ef4444;
   --success: #10a37f;
@@ -51,9 +51,11 @@ a:hover {
 /* Glassmorphism Container Utility */
 .glass-panel {
   background: var(--glass-bg);
+  backdrop-filter: blur(12px);
   border: 1px solid var(--glass-border);
   border-radius: 12px;
   padding: 2rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 /* Common Buttons */

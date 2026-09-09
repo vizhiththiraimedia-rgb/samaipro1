@@ -1,14 +1,14 @@
 <?php
 // =========================================================================
 // SAM AI - Service Configuration: Sam Translate
-// Auto-generated: 2026-09-04T02:56:27.085847
+// Auto-generated: 2026-09-05T03:42:25.598451
 // =========================================================================
 
 define('ENVIRONMENT', 'production');
 define('SAMAI_API_BASE', 'https://samai.com');
 define('SERVICE_NAME', 'Sam Translate');
 define('SERVICE_SLUG', 'sam-translate');
-define('SERVICE_KEY', 'sk-samai-translate-test123abc');
+define('SERVICE_KEY', 'svc_sam-translate_f6fa85d2c89a');
 define('SERVICE_ENDPOINT_PREFIX', '/translate');
 
 // Theme
@@ -18,7 +18,7 @@ define('THEME_COLOR_HOVER', '#00a56d');
 // Site Info
 define('SITE_TITLE', 'Sam Translate');
 define('SITE_TAGLINE', 'Translate between Sinhala, Tamil, and English');
-define('SITE_DOMAIN', 'https://translate.sam.ai');
+define('SITE_DOMAIN', 'https://sam-translate.sam.ai');
 
 // Credit Costs (from api_registry.json)
 define('CREDIT_COST_TEXT', 1);

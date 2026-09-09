@@ -1,8 +1,8 @@
 <?php
 // =========================================================================
 // SAM AI - Dynamic Dashboard Template
-// This template renders a form based on the service's first non-free endpoint
-// Customized per service by the deployment generator.
+// Renders a form based on the service's endpoint config from config.php.
+// No external file dependencies — works standalone on any cPanel.
 // =========================================================================
 require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/includes/auth-check.php';
@@ -16,36 +16,10 @@ $credit_balance = $balance_result['status'] === 'success'
     ? ($balance_result['data']['balance'] ?? 0)
     : 0;
 
-// Load service config from registry
-$registry_path = __DIR__ . '/../api_registry.json';
-$registry = file_exists($registry_path) ? json_decode(file_get_contents($registry_path), true) : [];
-
-$service_config = null;
-foreach ($registry['services'] ?? [] as $svc) {
-    if ($svc['service_slug'] === SERVICE_SLUG) {
-        $service_config = $svc;
-        break;
-    }
-}
-
-// Get the first POST endpoint as the primary action
-$primary_endpoint = null;
-$credit_cost = 1;
-foreach ($service_config['endpoints'] ?? [] as $ep) {
-    if ($ep['method'] === 'POST' && $ep['cost_credits'] > 0) {
-        $primary_endpoint = $ep;
-        $credit_cost = $ep['cost_credits'];
-        break;
-    }
-}
-
-if (!$primary_endpoint) {
-    $primary_endpoint = $service_config['endpoints'][0] ?? null;
-    $credit_cost = $primary_endpoint['cost_credits'] ?? 0;
-}
-
+$credit_cost = CREDIT_COST_PRIMARY;
 $has_sufficient_credits = $credit_balance >= $credit_cost;
 
+$primary = $SAMAI_ENDPOINTS[$SAMAI_PRIMARY_ENDPOINT] ?? null;
 $result = null;
 $error = '';
 
@@ -64,7 +38,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['generate'])) {
         }
     }
 
-    $endpoint = SERVICE_ENDPOINT_PREFIX . '/' . ($primary_endpoint['path'] ?? '');
+    if ($primary) {
+        $endpoint = $primary['path'];
+    } else {
+        $endpoint = SERVICE_ENDPOINT_PREFIX . '/' . $SAMAI_PRIMARY_ENDPOINT;
+    }
 
     $api_result = $api->post($endpoint, $params);
 
@@ -118,49 +96,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['generate'])) {
         </div>
 
         <div class="form-section">
-            <h2><?php echo $primary_endpoint['description'] ?? 'Generate Content'; ?></h2>
+            <h2><?php echo $primary['path'] ?? 'Generate Content'; ?></h2>
             <?php if ($error): ?>
                 <div class="error-msg"><?php echo htmlspecialchars($error); ?></div>
             <?php endif; ?>
 
             <form method="POST" action="">
-                <?php if ($service_config): ?>
-                    <?php foreach ($service_config['endpoints'] as $ep): ?>
-                        <?php if ($ep['method'] !== 'POST'): continue; endif; ?>
-                        <?php
-                        $fields = $ep['params'] ?? [];
-                        ?>
-                        <?php if (!empty($fields)): ?>
-                            <?php foreach ($fields as $field_name => $field_def): ?>
-                                <?php
-                                $field_type = 'text';
-                                $field_label = ucwords(str_replace('_', ' ', $field_name));
-                                $required = false;
-                                $field_default = '';
-
-                                $parts = explode(',', $field_def);
-                                foreach ($parts as $part) {
-                                    $part = trim($part);
-                                    if ($part === 'required') $required = true;
-                                    if (strpos($part, 'default=') === 0) {
-                                        $field_default = substr($part, 7);
-                                    }
-                                    if (in_array($part, ['email', 'url'])) $field_type = $part;
-                                }
-                                ?>
-                                <div class="form-group">
-                                    <label for="<?php echo $field_name; ?>"><?php echo $field_label; ?><?php echo $required ? ' *' : ''; ?></label>
-                                    <input type="<?php echo $field_type; ?>" id="<?php echo $field_name; ?>" name="<?php echo $field_name; ?>"
-                                           value="<?php echo htmlspecialchars($field_default); ?>"
-                                           <?php echo $required ? 'required' : ''; ?>
-                                           placeholder="<?php echo $field_label; ?>">
-                                </div>
-                            <?php endforeach; ?>
-                        <?php endif; ?>
-
-                        <!-- Show only the first POST endpoint's form -->
-                        <?php break; ?>
+                <?php if ($primary && isset($primary['params'])): ?>
+                    <?php foreach ($primary['params'] as $field_name => $field_def): ?>
+                        <div class="form-group">
+                            <label for="<?php echo $field_name; ?>">
+                                <?php echo $field_def['label'] ?? ucwords(str_replace('_', ' ', $field_name)); ?>
+                                <?php echo ($field_def['required'] ?? false) ? ' *' : ''; ?>
+                            </label>
+                            <?php echo getEndpointField($field_name, $field_def); ?>
+                        </div>
                     <?php endforeach; ?>
+                <?php else: ?>
+                    <div class="form-group">
+                        <label for="prompt">Prompt *</label>
+                        <textarea name="prompt" id="prompt" rows="4" required placeholder="Enter your request..."></textarea>
+                    </div>
                 <?php endif; ?>
 
                 <div class="form-group">
@@ -188,6 +144,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['generate'])) {
                         echo htmlspecialchars($result['content']);
                     } elseif (isset($result['code'])) {
                         echo htmlspecialchars($result['code']);
+                    } elseif (isset($result['response'])) {
+                        echo htmlspecialchars($result['response']);
                     } else {
                         echo htmlspecialchars(json_encode($result, JSON_PRETTY_PRINT));
                     }

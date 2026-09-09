@@ -12,4 +12,4 @@
 # Required environment variables:
 #   SAMAI_API_BASE=https://samai.com
 #   SAMAI_SERVICE_KEY=sk-samai-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-API Key: sk-samai-testkey-abc123def456
+API Key: svc_newsflash-pro_34ecab844395

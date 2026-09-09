@@ -1,0 +1,15 @@
+# cPanel Configuration for Sam Bot (Telegram) (sam-bot)
+# Deploy this site by:
+# 1. Creating a subdomain or addon domain in cPanel
+# 2. Pointing the document root to the service directory
+# 3. Copying all files from the generated directory
+#
+# Domain: sam-bot.sam.ai
+# Document Root: /home/samaiuser/samai-projects/sam-bot/public_html
+# PHP Version: 8.2+
+#
+# Required PHP extensions: curl, mbstring, openssl, json
+# Required environment variables:
+#   SAMAI_API_BASE=https://samai.com
+#   SAMAI_SERVICE_KEY=sk-samai-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+API Key: svc_sam-bot_0bfd2fe03f0f

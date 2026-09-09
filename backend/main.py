@@ -163,6 +163,30 @@ except Exception as e:
 
 @app.on_event("startup")
 async def startup_event():
+
+    # --- AUTO MIGRATION FOR ACCESS KEYS ---
+    try:
+        from sqlalchemy import text
+        _db = SessionLocal()
+        # For Postgres and SQLite compatibility, we try them one by one
+        cols = [
+            "api_credit_balance INTEGER DEFAULT 0",
+            "service_tier VARCHAR(50) DEFAULT 'free'",
+            "key_type VARCHAR(20) DEFAULT 'staff'",
+            "duration_label VARCHAR(20)",
+            "payment_verified VARCHAR(10) DEFAULT 'false'",
+            "telegram_chat_id VARCHAR(50)"
+        ]
+        for col in cols:
+            try:
+                _db.execute(text(f"ALTER TABLE access_keys ADD COLUMN {col}"))
+                _db.commit()
+            except Exception as e:
+                _db.rollback()
+        _db.close()
+    except Exception:
+        pass
+    # --------------------------------------
     from permissions.grants import grant_manager
     from permissions.quota import quota_manager
     from security_ext.refresh_tokens import refresh_token_manager

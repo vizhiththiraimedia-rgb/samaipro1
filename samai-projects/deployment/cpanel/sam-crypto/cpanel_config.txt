@@ -12,4 +12,4 @@
 # Required environment variables:
 #   SAMAI_API_BASE=https://samai.com
 #   SAMAI_SERVICE_KEY=sk-samai-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-API Key: sk-samai-crypto-test123abc456
+API Key: svc_sam-crypto_bce83bc5a361

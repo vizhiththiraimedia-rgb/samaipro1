@@ -20,7 +20,7 @@ import os
 import json
 
 from database import SessionLocal, get_db
-from models import ServiceAPIKey, UserCredits, CreditTransaction, ServiceSubscription, AccessKey
+from models import ServiceAPIKey, UserCredit, CreditTransaction, AccessKey
 from middleware.api_key_auth import get_api_key, get_current_user, api_key_auth
 
 router = APIRouter(prefix="/api/services", tags=["services"])
@@ -114,9 +114,9 @@ def get_credit_balance(
     """Get user's credit balance for a specific service."""
     db = SessionLocal()
     try:
-        credits = db.query(UserCredits).filter(
-            UserCredits.user_id == user["user_id"],
-            UserCredits.service_name == service["service_name"],
+        credits = db.query(UserCredit).filter(
+            UserCredit.user_id == user["user_id"],
+            UserCredit.service_name == service["service_name"],
         ).first()
 
         if not credits:
@@ -235,13 +235,13 @@ def purchase_credits(
     db = SessionLocal()
     try:
         # Find or create user credits record
-        credits = db.query(UserCredits).filter(
-            UserCredits.user_id == user["user_id"],
-            UserCredits.service_name == service["service_name"],
+        credits = db.query(UserCredit).filter(
+            UserCredit.user_id == user["user_id"],
+            UserCredit.service_name == service["service_name"],
         ).first()
 
         if not credits:
-            credits = UserCredits(
+            credits = UserCredit(
                 user_id=user["user_id"],
                 service_name=service["service_name"],
                 balance=0,

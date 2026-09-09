@@ -86,6 +86,8 @@ async def chat_local(req: ChatRequest):
         response_text = output['choices'][0]['text']
         return {"response": response_text.strip()}
     except ImportError:
-        raise HTTPException(status_code=500, detail="llama-cpp-python is not installed. Please run: pip install llama-cpp-python")
+        # Fallback for Windows users missing C++ build tools
+        fallback_msg = f"[MOCK OFFLINE MODE] I amSAM Mastermind. You asked: '{req.message}'. (Note: llama-cpp-python is missing C++ tools on your PC, so this is a simulated local response)."
+        return {"response": fallback_msg}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

@@ -18,7 +18,11 @@
           "path": "/social-news/generate-post",
           "cost_credits": 2,
           "description": "Generate social media post from news URL",
-          "params": { "url": "required", "language": "optional,default=en", "tone": "optional" }
+          "params": {
+            "url": "required",
+            "language": "optional,default=en",
+            "tone": "optional"
+          }
         },
         {
           "name": "schedule",
@@ -51,7 +55,10 @@
           "path": "/coding/generate",
           "cost_credits": 5,
           "description": "Generate code from description",
-          "params": { "prompt": "required", "language": "optional,default=python" }
+          "params": {
+            "prompt": "required",
+            "language": "optional,default=python"
+          }
         },
         {
           "name": "review",
@@ -91,7 +98,11 @@
           "path": "/translate/text",
           "cost_credits": 1,
           "description": "Translate text between languages",
-          "params": { "text": "required", "source_lang": "required", "target_lang": "required" }
+          "params": {
+            "text": "required",
+            "source_lang": "required",
+            "target_lang": "required"
+          }
         },
         {
           "name": "document",
@@ -117,7 +128,11 @@
           "path": "/image/generate",
           "cost_credits": 5,
           "description": "Generate image from text prompt",
-          "params": { "prompt": "required", "style": "optional", "size": "optional" }
+          "params": {
+            "prompt": "required",
+            "style": "optional",
+            "size": "optional"
+          }
         },
         {
           "name": "analyze",
@@ -150,7 +165,10 @@
           "path": "/voice/tts",
           "cost_credits": 2,
           "description": "Convert text to speech audio",
-          "params": { "text": "required", "voice": "optional,default=en-US-Jenny" }
+          "params": {
+            "text": "required",
+            "voice": "optional,default=en-US-Jenny"
+          }
         },
         {
           "name": "stt",
@@ -1049,6 +1067,331 @@
           "path": "/dashboard",
           "cost_credits": 0,
           "description": "Get dashboard overview"
+        }
+      ]
+    },
+    "samai_studio": {
+      "service_name": "SAM AI Studio",
+      "service_slug": "samai-studio",
+      "description": "AI-powered Digital Audio Workstation (DAW) for music creation",
+      "module": "music_studio",
+      "endpoint_prefix": "/music/studio",
+      "theme_color": "#8b5cf6",
+      "cost_tier": "premium",
+      "endpoints": [
+        {
+          "name": "create_track",
+          "method": "POST",
+          "path": "/music/studio/track",
+          "cost_credits": 3,
+          "description": "Create or modify a track",
+          "params": {
+            "project_id": "optional",
+            "track_type": "optional,default=audio",
+            "name": "optional"
+          }
+        },
+        {
+          "name": "export_project",
+          "method": "POST",
+          "path": "/music/studio/export",
+          "cost_credits": 5,
+          "description": "Export project as audio file",
+          "params": {
+            "format": "optional,default=wav",
+            "quality": "optional,default=high"
+          }
+        }
+      ]
+    },
+    "samai_producer": {
+      "service_name": "SAM AI Producer",
+      "service_slug": "samai-producer",
+      "description": "AI-powered music production: compose, arrange, mix, and master",
+      "module": "music_producer",
+      "endpoint_prefix": "/music/producer",
+      "theme_color": "#06b6d4",
+      "cost_tier": "premium",
+      "endpoints": [
+        {
+          "name": "compose",
+          "method": "POST",
+          "path": "/music/producer/compose",
+          "cost_credits": 8,
+          "description": "AI composition from prompt",
+          "params": {
+            "prompt": "required",
+            "genre": "optional",
+            "mood": "optional",
+            "tempo": "optional,default=120"
+          }
+        },
+        {
+          "name": "master",
+          "method": "POST",
+          "path": "/music/producer/master",
+          "cost_credits": 6,
+          "description": "AI mastering of audio track",
+          "params": {
+            "audio_url": "required",
+            "preset": "optional,default=loudness",
+            "format": "optional,default=wav"
+          }
+        }
+      ]
+    },
+    "samai_stems": {
+      "service_name": "SAM AI Stems",
+      "service_slug": "samai-stems",
+      "description": "AI-powered stem separation for audio files",
+      "module": "music_stems",
+      "endpoint_prefix": "/music/stems",
+      "theme_color": "#f59e0b",
+      "cost_tier": "premium",
+      "endpoints": [
+        {
+          "name": "separate",
+          "method": "POST",
+          "path": "/music/stems/separate",
+          "cost_credits": 5,
+          "description": "Separate audio into individual stems",
+          "params": {
+            "audio_url": "required",
+            "stem_types": "optional,default=vocals,drums,bass,other"
+          }
+        },
+        {
+          "name": "download",
+          "method": "GET",
+          "path": "/music/stems/download",
+          "cost_credits": 1,
+          "description": "Download separated stem",
+          "params": {
+            "stem_id": "required",
+            "format": "optional,default=wav"
+          }
+        }
+      ]
+    },
+    "samai_voices": {
+      "service_name": "SAM AI Voice Lab",
+      "service_slug": "samai-voices",
+      "description": "AI voice cloning, text-to-speech, and vocal synthesis",
+      "module": "music_voices",
+      "endpoint_prefix": "/music/voices",
+      "theme_color": "#ec4899",
+      "cost_tier": "premium",
+      "endpoints": [
+        {
+          "name": "clone",
+          "method": "POST",
+          "path": "/music/voices/clone",
+          "cost_credits": 15,
+          "description": "Clone a voice from audio samples",
+          "params": {
+            "samples": "required",
+            "voice_name": "required",
+            "language": "optional,default=en"
+          }
+        },
+        {
+          "name": "tts",
+          "method": "POST",
+          "path": "/music/voices/tts",
+          "cost_credits": 2,
+          "description": "Convert text to speech with custom voice",
+          "params": {
+            "text": "required",
+            "voice_id": "optional",
+            "pitch": "optional,default=0",
+            "speed": "optional,default=100"
+          }
+        }
+      ]
+    },
+    "samai_midi": {
+      "service_name": "SAM AI MIDI Editor",
+      "service_slug": "samai-midi",
+      "description": "AI-powered MIDI composition and editing with piano roll",
+      "module": "music_midi",
+      "endpoint_prefix": "/music/midi",
+      "theme_color": "#a855f7",
+      "cost_tier": "standard",
+      "endpoints": [
+        {
+          "name": "compose_midi",
+          "method": "POST",
+          "path": "/music/midi/compose",
+          "cost_credits": 4,
+          "description": "Generate MIDI from text prompt",
+          "params": {
+            "prompt": "required",
+            "key": "optional,default=C",
+            "scale": "optional,default=major",
+            "tempo": "optional,default=120"
+          }
+        },
+        {
+          "name": "export_midi",
+          "method": "POST",
+          "path": "/music/midi/export",
+          "cost_credits": 0,
+          "description": "Export MIDI file",
+          "params": {
+            "midi_data": "required",
+            "format": "optional,default=midi"
+          }
+        }
+      ]
+    },
+    "webdev_lk": {
+      "service_name": "WebDev LK",
+      "service_slug": "webdev-lk",
+      "description": "AI Website Builder and Generator",
+      "module": "web_builder",
+      "endpoint_prefix": "/web-builder",
+      "theme_color": "#4f46e5",
+      "cost_tier": "premium",
+      "endpoints": [
+        {
+          "name": "generate_site",
+          "method": "POST",
+          "path": "/web-builder/generate",
+          "cost_credits": 10,
+          "description": "Generate website from description",
+          "params": {
+            "prompt": "required",
+            "language": "optional,default=en"
+          }
+        }
+      ]
+    },
+    "sam_superapp": {
+      "service_name": "Samakuru",
+      "service_slug": "sam-superapp",
+      "description": "Samakuru - The Ultimate Super App for Sri Lanka with News, Typing, and Voice tools",
+      "module": "super_app",
+      "endpoint_prefix": "/superapp",
+      "theme_color": "#e83e8c",
+      "cost_tier": "standard",
+      "endpoints": [
+        {
+          "name": "get_news",
+          "method": "GET",
+          "path": "/superapp/news",
+          "cost_credits": 1,
+          "description": "Get AI generated news"
+        },
+        {
+          "name": "translate_type",
+          "method": "POST",
+          "path": "/superapp/type",
+          "cost_credits": 1,
+          "description": "AI voice/text typing (Sinhala/Tamil/English)"
+        }
+      ]
+    },
+    "sam_fullstack": {
+      "service_name": "Sam FullStack Builder",
+      "service_slug": "sam-fullstack",
+      "description": "Full-stack web application development with Next.js, TypeScript, PostgreSQL, and automated deployment",
+      "module": "fullstack_dev",
+      "endpoint_prefix": "/fullstack",
+      "theme_color": "#0f172a",
+      "cost_tier": "premium",
+      "endpoints": [
+        {
+          "name": "plan",
+          "method": "POST",
+          "path": "/fullstack/plan",
+          "cost_credits": 3,
+          "description": "Requirement analysis, feature planning, and project architecture",
+          "params": {
+            "prompt": "required",
+            "target_audience": "optional,default=general"
+          }
+        },
+        {
+          "name": "scaffold",
+          "method": "POST",
+          "path": "/fullstack/scaffold",
+          "cost_credits": 25,
+          "description": "Generate complete project scaffold with full architecture",
+          "params": {
+            "prompt": "required",
+            "stack": "optional,default=nextjs-postgresql",
+            "features": "optional"
+          }
+        },
+        {
+          "name": "frontend",
+          "method": "POST",
+          "path": "/fullstack/frontend",
+          "cost_credits": 10,
+          "description": "Generate frontend UI with Next.js, TypeScript, and Tailwind CSS",
+          "params": {
+            "prompt": "required",
+            "pages": "optional,default=3",
+            "theme": "optional,default=dark"
+          }
+        },
+        {
+          "name": "backend",
+          "method": "POST",
+          "path": "/fullstack/backend",
+          "cost_credits": 10,
+          "description": "Generate REST API endpoints and server logic",
+          "params": {
+            "prompt": "required",
+            "endpoints": "optional",
+            "database": "optional,default=postgresql"
+          }
+        },
+        {
+          "name": "database",
+          "method": "POST",
+          "path": "/fullstack/database",
+          "cost_credits": 8,
+          "description": "Design database schema, models, and migrations",
+          "params": {
+            "prompt": "required",
+            "engine": "optional,default=postgresql",
+            "tables": "optional"
+          }
+        },
+        {
+          "name": "auth",
+          "method": "POST",
+          "path": "/fullstack/auth",
+          "cost_credits": 8,
+          "description": "Generate authentication system with JWT and RBAC",
+          "params": {
+            "prompt": "required",
+            "provider": "optional,default=jwt",
+            "roles": "optional"
+          }
+        },
+        {
+          "name": "admin",
+          "method": "POST",
+          "path": "/fullstack/admin",
+          "cost_credits": 12,
+          "description": "Generate admin dashboard with user and content management",
+          "params": {
+            "prompt": "required",
+            "model": "optional,default=Admin"
+          }
+        },
+        {
+          "name": "deploy",
+          "method": "POST",
+          "path": "/fullstack/deploy",
+          "cost_credits": 6,
+          "description": "Generate deployment configs, CI/CD, and environment setup",
+          "params": {
+            "prompt": "required",
+            "platform": "optional,default=vercel"
+          }
         }
       ]
     }

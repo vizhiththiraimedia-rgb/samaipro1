@@ -1,12 +1,4 @@
 const getBaseUrl = () => {
-  if (typeof window !== 'undefined') {
-    // On localhost, use local Python backend
-    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-      return 'http://localhost:8000';
-    }
-    // On Vercel or any production host, use relative paths (Next.js API routes)
-    return '';
-  }
   return '';
 };
 
@@ -58,8 +50,11 @@ export const apiFetch = async (endpoint: string, options: RequestInit = {}) => {
   }
 
   if (!token && typeof window !== 'undefined' && window.location.pathname !== '/login') {
-    window.location.href = '/login';
-    throw new Error('Not authenticated');
+    // Skip forced redirect on localhost for easy testing
+    if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+      window.location.href = '/login';
+      throw new Error('Not authenticated');
+    }
   }
 
   const url = baseUrl ? `${baseUrl}${targetEndpoint}` : targetEndpoint;

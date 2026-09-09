@@ -1,14 +1,14 @@
 <?php
 // =========================================================================
 // SAM AI - Service Configuration: Sam Crypto Pro
-// Auto-generated: 2026-09-04T02:56:26.382120
+// Auto-generated: 2026-09-05T03:42:25.668633
 // =========================================================================
 
 define('ENVIRONMENT', 'production');
 define('SAMAI_API_BASE', 'https://samai.com');
 define('SERVICE_NAME', 'Sam Crypto Pro');
 define('SERVICE_SLUG', 'sam-crypto');
-define('SERVICE_KEY', 'sk-samai-crypto-test123abc456');
+define('SERVICE_KEY', 'svc_sam-crypto_bce83bc5a361');
 define('SERVICE_ENDPOINT_PREFIX', '/crypto');
 
 // Theme
@@ -18,7 +18,7 @@ define('THEME_COLOR_HOVER', '#00a494');
 // Site Info
 define('SITE_TITLE', 'Sam Crypto Pro');
 define('SITE_TAGLINE', 'Cryptocurrency market analysis and trading signals');
-define('SITE_DOMAIN', 'https://crypto.sam.ai');
+define('SITE_DOMAIN', 'https://sam-crypto.sam.ai');
 
 // Credit Costs (from api_registry.json)
 define('CREDIT_COST_MARKET', 1);

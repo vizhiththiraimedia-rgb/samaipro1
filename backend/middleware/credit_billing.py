@@ -182,9 +182,9 @@ class CreditBillingMiddleware(BaseHTTPMiddleware):
             # Check user credit balance
             db = SessionLocal()
             try:
-                user_credits = db.query(models.UserCredits).filter(
-                    models.UserCredits.user_id == user_info["user_id"],
-                    models.UserCredits.service_name == service_info["service_name"]
+                user_credits = db.query(models.UserCredit).filter(
+                    models.UserCredit.user_id == user_info["user_id"],
+                    models.UserCredit.service_name == service_info["service_name"]
                 ).first()
 
                 if user_credits and user_credits.balance < cost:
@@ -226,9 +226,9 @@ class CreditBillingMiddleware(BaseHTTPMiddleware):
             db = SessionLocal()
             try:
                 if user_info:
-                    user_credits = db.query(models.UserCredits).filter(
-                        models.UserCredits.user_id == user_info["user_id"],
-                        models.UserCredits.service_name == service_info["service_name"]
+                    user_credits = db.query(models.UserCredit).filter(
+                        models.UserCredit.user_id == user_info["user_id"],
+                        models.UserCredit.service_name == service_info["service_name"]
                     ).first()
 
                     if user_credits:

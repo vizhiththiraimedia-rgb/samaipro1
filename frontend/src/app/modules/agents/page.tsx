@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { apiFetch } from "../../../utils/api";
 import { 
-  Bot, Brain, Search, Code, TrendingUp, FileText, 
+  Bot, Brain, Search, Code, TrendingUp, FileText, Music,
   Play, Sparkles, Check, Copy, ArrowLeft, Clock, 
   CheckCircle2, Layers, Cpu, Users
 } from "lucide-react";
@@ -15,6 +15,8 @@ type AgentInfo = {
   color: string;
   description: string;
   tools: string[];
+  emoji?: string;
+  category?: string;
 };
 
 type ExecutionResult = {
@@ -90,6 +92,7 @@ export default function AgentsPage() {
       if (data && Array.isArray(data) && data.length > 0) {
         const realAgents = data.map((a: any) => ({
           name: a.name,
+          icon: a.icon || Music,
           color: a.color || "#8b5cf6",
           description: a.description || a.vibe || "Specialized AI Agent",
           tools: [a.category],
