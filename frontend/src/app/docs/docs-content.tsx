@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 
-const LIVE_DOMAIN = "https://samaipro.vercel.app";
+const LIVE_DOMAIN = "https://samaipro-production-477a.up.railway.app";
 
 const MODULES = [
   { icon: "💬", name: "AI Chat Engine", path: "/api/chat/default", method: "POST", desc: "Conversational assistant with multi-file analysis & context" },
@@ -163,7 +163,7 @@ export default function DocsContent() {
             {/* Live Stats */}
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "1rem", marginBottom: "2rem" }}>
               {[
-                { label: "Live Domain", value: "samaipro.vercel.app", color: "#22c55e" },
+                { label: "Live Domain", value: "samaipro-production-477a.up.railway.app", color: "#22c55e" },
                 { label: "API Version", value: "v1.0.0", color: "#6366f1" },
                 { label: "Live Coins", value: liveStats.coins > 0 ? `${liveStats.coins} coins` : "Loading...", color: "#f59e0b" },
                 { label: "API Status", value: apiStatus === "online" ? "Online" : "Checking...", color: apiStatus === "online" ? "#22c55e" : "#6366f1" },
@@ -178,7 +178,7 @@ export default function DocsContent() {
             <div style={{ background: "rgba(34,197,94,0.08)", border: "1px solid rgba(34,197,94,0.3)", borderRadius: "10px", padding: "1rem 1.2rem" }}>
               <strong style={{ color: "#22c55e" }}>🌐 Production Domain:</strong>
               <div style={{ marginTop: "0.3rem", fontFamily: "monospace", fontSize: "1rem", color: "#e6edf3" }}>
-                https://samaipro.vercel.app
+                https://samaipro-production-477a.up.railway.app
               </div>
             </div>
           </div>
@@ -190,7 +190,7 @@ export default function DocsContent() {
             <h2 style={{ fontSize: "1.8rem", fontWeight: 700, marginBottom: "1rem" }}>🌐 Base URL & Domain</h2>
             <p style={{ color: "var(--text-muted)", marginBottom: "1.5rem" }}>All API requests must use the following production base URL:</p>
 
-            <CodeBlock code={`Base URL:\nhttps://samaipro.vercel.app\n\nAPI Routes:\nhttps://samaipro.vercel.app/api/<endpoint>\n\nExamples:\nhttps://samaipro.vercel.app/api/crypto/market\nhttps://samaipro.vercel.app/api/chat/default\nhttps://samaipro.vercel.app/api/lead-gen/search`} id="baseurl" />
+            <CodeBlock code={`Base URL:\nhttps://samaipro-production-477a.up.railway.app\n\nAPI Routes:\nhttps://samaipro-production-477a.up.railway.app/api/<endpoint>\n\nExamples:\nhttps://samaipro-production-477a.up.railway.app/api/crypto/market\nhttps://samaipro-production-477a.up.railway.app/api/chat/default\nhttps://samaipro-production-477a.up.railway.app/api/lead-gen/search`} id="baseurl" />
 
             <div style={{ marginTop: "2rem" }}>
               <h3 style={{ fontSize: "1.2rem", marginBottom: "1rem" }}>📍 Quick Live Test</h3>
@@ -221,10 +221,10 @@ export default function DocsContent() {
             <h2 style={{ fontSize: "1.8rem", fontWeight: 700, marginBottom: "1rem" }}>🔐 Authentication</h2>
             <p style={{ color: "var(--text-muted)", marginBottom: "1.5rem" }}>SAM AI uses JWT (JSON Web Tokens) for authentication. Include the token in the <code style={{ background: "rgba(99,102,241,0.2)", padding: "0.1rem 0.4rem", borderRadius: "4px" }}>Authorization</code> header.</p>
 
-            <CodeBlock code={`# Login to get JWT token\nPOST https://samaipro.vercel.app/api/auth/login\n\nRequest Body:\n{\n  "email": "your@email.com",\n  "password": "yourpassword"\n}\n\nResponse:\n{\n  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",\n  "token_type": "bearer",\n  "user": { "id": 1, "email": "your@email.com" }\n}`} id="auth-example" />
+            <CodeBlock code={`# Login to get JWT token\nPOST https://samaipro-production-477a.up.railway.app/api/auth/login\n\nRequest Body:\n{\n  "email": "your@email.com",\n  "password": "yourpassword"\n}\n\nResponse:\n{\n  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",\n  "token_type": "bearer",\n  "user": { "id": 1, "email": "your@email.com" }\n}`} id="auth-example" />
 
             <h3 style={{ fontSize: "1.1rem", marginTop: "1.5rem", marginBottom: "0.8rem" }}>Using the Token:</h3>
-            <CodeBlock code={`# Include token in all API requests:\ncurl -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \\\n     https://samaipro.vercel.app/api/chat/default`} id="auth-usage" />
+            <CodeBlock code={`# Include token in all API requests:\ncurl -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \\\n     https://samaipro-production-477a.up.railway.app/api/chat/default`} id="auth-usage" />
 
             <div style={{ marginTop: "1.5rem", background: "rgba(99,102,241,0.1)", border: "1px solid rgba(99,102,241,0.3)", borderRadius: "10px", padding: "1rem 1.2rem" }}>
               <strong style={{ color: "#818cf8" }}>Note:</strong>
@@ -239,7 +239,7 @@ export default function DocsContent() {
         {activeSection === "endpoints" && (
           <div className="animate-fade-in">
             <h2 style={{ fontSize: "1.8rem", fontWeight: 700, marginBottom: "0.5rem" }}>📡 All API Endpoints</h2>
-            <p style={{ color: "var(--text-muted)", marginBottom: "1.5rem" }}>All endpoints are live on <strong style={{ color: "#22c55e" }}>https://samaipro.vercel.app</strong></p>
+            <p style={{ color: "var(--text-muted)", marginBottom: "1.5rem" }}>All endpoints are live on <strong style={{ color: "#22c55e" }}>https://samaipro-production-477a.up.railway.app</strong></p>
 
             <div style={{ display: "flex", flexDirection: "column", gap: "0.8rem" }}>
               {MODULES.map((m, i) => (
@@ -290,7 +290,7 @@ export default function DocsContent() {
                   <option value="DELETE">DELETE</option>
                 </select>
                 <div style={{ flex: 1, display: "flex", alignItems: "center", background: "rgba(0,0,0,0.3)", border: "1px solid var(--border)", borderRadius: "8px", paddingLeft: "0.8rem", fontSize: "0.85rem", color: "var(--text-muted)", minWidth: "200px" }}>
-                  <span style={{ color: "#22c55e", marginRight: "0.4rem", fontFamily: "monospace" }}>samaipro.vercel.app</span>
+                  <span style={{ color: "#22c55e", marginRight: "0.4rem", fontFamily: "monospace" }}>samaipro-production-477a.up.railway.app</span>
                   <input
                     type="text"
                     value={tryItPath}
@@ -354,16 +354,16 @@ export default function DocsContent() {
             <p style={{ color: "var(--text-muted)", marginBottom: "1.5rem" }}>Code examples for integrating SAM AI API in different languages, all pointing to the live domain.</p>
 
             <h3 style={{ marginBottom: "0.8rem" }}>cURL</h3>
-            <CodeBlock code={`# Crypto Market Data\ncurl https://samaipro.vercel.app/api/crypto/market\n\n# AI Chat\ncurl -X POST https://samaipro.vercel.app/api/chat/default \\\n  -H "Content-Type: application/json" \\\n  -d '{"content": "Hello SAM AI!"}'\n\n# Lead Gen Search\ncurl -X POST https://samaipro.vercel.app/api/lead-gen/search \\\n  -H "Content-Type: application/json" \\\n  -d '{"query": "Restaurants", "city": "Madurai"}'`} id="curl" />
+            <CodeBlock code={`# Crypto Market Data\ncurl https://samaipro-production-477a.up.railway.app/api/crypto/market\n\n# AI Chat\ncurl -X POST https://samaipro-production-477a.up.railway.app/api/chat/default \\\n  -H "Content-Type: application/json" \\\n  -d '{"content": "Hello SAM AI!"}'\n\n# Lead Gen Search\ncurl -X POST https://samaipro-production-477a.up.railway.app/api/lead-gen/search \\\n  -H "Content-Type: application/json" \\\n  -d '{"query": "Restaurants", "city": "Madurai"}'`} id="curl" />
 
             <h3 style={{ marginTop: "1.5rem", marginBottom: "0.8rem" }}>JavaScript / Node.js</h3>
-            <CodeBlock code={`const BASE_URL = "https://samaipro.vercel.app";\n\n// Fetch live crypto prices\nconst res = await fetch(\`\${BASE_URL}/api/crypto/market\`);\nconst data = await res.json();\nconsole.log(data.coins);\n\n// Send message to AI\nconst chatRes = await fetch(\`\${BASE_URL}/api/chat/default\`, {\n  method: "POST",\n  headers: { "Content-Type": "application/json" },\n  body: JSON.stringify({ content: "Hello SAM AI!" })\n});\nconst reply = await chatRes.json();\nconsole.log(reply.content);`} id="nodejs" />
+            <CodeBlock code={`const BASE_URL = "https://samaipro-production-477a.up.railway.app";\n\n// Fetch live crypto prices\nconst res = await fetch(\`\${BASE_URL}/api/crypto/market\`);\nconst data = await res.json();\nconsole.log(data.coins);\n\n// Send message to AI\nconst chatRes = await fetch(\`\${BASE_URL}/api/chat/default\`, {\n  method: "POST",\n  headers: { "Content-Type": "application/json" },\n  body: JSON.stringify({ content: "Hello SAM AI!" })\n});\nconst reply = await chatRes.json();\nconsole.log(reply.content);`} id="nodejs" />
 
             <h3 style={{ marginTop: "1.5rem", marginBottom: "0.8rem" }}>Python</h3>
             <CodeBlock code={[
               "import requests",
               "",
-              'BASE_URL = "https://samaipro.vercel.app"',
+              'BASE_URL = "https://samaipro-production-477a.up.railway.app"',
               "",
               "# Fetch crypto market",
               'res = requests.get(BASE_URL + "/api/crypto/market")',
@@ -388,7 +388,7 @@ export default function DocsContent() {
             <h3 style={{ marginTop: "1.5rem", marginBottom: "0.8rem" }}>PHP</h3>
             <CodeBlock code={[
               "<?php",
-              '$BASE_URL = "https://samaipro.vercel.app";',
+              '$BASE_URL = "https://samaipro-production-477a.up.railway.app";',
               "",
               "// Fetch crypto market",
               '$response = file_get_contents($BASE_URL . "/api/crypto/market");',
